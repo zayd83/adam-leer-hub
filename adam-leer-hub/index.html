@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Adams leer-hub</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap">
+<style>
+/* VOICE everyday learning game for an 11-year-old with ADHD: energetic, short, clear
+   IDEA a training dojo: you level up by training, every subject is a skill tree; pages are ruitjespapier
+   PICTURE home: big rank emblem with XP ring and power level; subject: chapter route; practice: one big question sheet with an aura that grows with the combo
+   COLOUR night-ink band #13233a with gold #f7b500; each subject keeps the colour of its own book cover
+   TYPE Baloo 2 (rounded display) + Atkinson Hyperlegible (easy reading)
+   LAYOUT band on top, then one clear column of cards; tools drawer at the bottom right */
+:root{color-scheme:light dark;
+--bg:light-dark(#fbfbf6,#0e1716);--grid:light-dark(#e5ebe6,#17231f);--ink:light-dark(#17222a,#e9f0ec);--muted:light-dark(#4f5d66,#a8b8b1);
+--card:light-dark(#ffffff,#152320);--line:light-dark(#d0dad4,#2b3c35);--night:#13233a;--gold:#f7b500;--goldsoft:light-dark(#fff3c9,#3a2f0b);
+--bad:light-dark(#c4304b,#ff7d93);--badsoft:light-dark(#fde7eb,#3a1820);--good:light-dark(#1d8a56,#43c487);--goodsoft:light-dark(#e2f5ea,#123323);--on:#fff;--vk:#17663f}
+:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+html,body{margin:0}
+body{background:var(--bg);background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:24px 24px;color:var(--ink);font:17px/1.55 "Atkinson Hyperlegible",system-ui,sans-serif;overflow-x:clip}
+h1,h2,h3{font-family:"Baloo 2",system-ui,sans-serif;line-height:1.08;letter-spacing:-.01em;margin:0;text-wrap:balance}
+h1{font-size:clamp(32px,5vw,48px);font-weight:800}
+h2{font-size:clamp(25px,3.3vw,32px);font-weight:800}
+h3{font-size:21px;font-weight:600}
+p{margin:.4em 0}
+button,input,select,textarea{font:inherit;color:inherit}
+.wrap{max-width:1180px;margin:0 auto;padding:0 max(4vw,16px)}
+main.wrap{padding-top:26px;padding-bottom:110px}
+:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.top{background:var(--vk);color:var(--on);padding:20px 0 28px}
+.top p{color:#ffffffd9;max-width:62ch}
+.top.ch{padding-bottom:0}
+.bar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:space-between}
+.back{background:transparent;border:2px solid #ffffff66;color:var(--on);border-radius:12px;padding:8px 14px;cursor:pointer;min-height:44px}
+.back:hover{background:#ffffff1a}
+.crumb{font-size:15px;color:#ffffffcc}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.btn{background:var(--vk);color:var(--on);border:0;border-radius:14px;padding:11px 20px;min-height:46px;font-weight:700;cursor:pointer;box-shadow:0 3px 0 color-mix(in srgb,var(--vk) 60%,#000)}
+.btn:hover{filter:brightness(1.08)}.btn:active{transform:translateY(2px);box-shadow:0 1px 0 color-mix(in srgb,var(--vk) 60%,#000)}
+.btn.sec{background:var(--card);color:var(--ink);border:2px solid var(--line);box-shadow:0 3px 0 var(--line)}
+.btn.gold{background:var(--gold);color:#2b2100;box-shadow:0 3px 0 #b88700}
+.btn.small{min-height:38px;padding:6px 14px;font-size:15px}
+.btn:disabled{opacity:.45;cursor:default}
+.card{background:var(--card);border:2px solid var(--line);border-radius:18px;padding:18px}
+.note{font-size:14px;color:var(--muted);margin-top:16px}
+.tip{font-size:15px;color:var(--muted)}
+.hidden{display:none!important}
+/* home dojo band */
+.dojo{background:var(--night);color:var(--on);padding:22px 0 30px;position:relative;overflow:hidden}
+.dojo::before{content:"";position:absolute;inset:0;background:repeating-conic-gradient(from 0deg at 82% 40%,#ffffff07 0 6deg,transparent 6deg 14deg)}
+.dojo .wrap{position:relative}
+.dgrid{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:24px;align-items:center}
+@media(max-width:760px){.dgrid{grid-template-columns:minmax(0,1fr)}}
+.greet{font:800 clamp(30px,4.6vw,46px)/1.05 "Baloo 2",sans-serif}
+.rankbox{display:flex;gap:18px;align-items:center}
+.emb{width:132px;height:132px;flex:none}
+.xpbar{height:16px;background:#ffffff22;border-radius:99px;overflow:hidden;margin:8px 0 4px}
+.xpbar i{display:block;height:100%;background:linear-gradient(90deg,#f7b500,#ffd75e)}
+.stats3{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+.pill{background:#ffffff14;border:1px solid #ffffff2a;border-radius:14px;padding:8px 12px;display:flex;gap:8px;align-items:center}
+.pill b{font:800 22px/1 "Baloo 2",sans-serif;color:var(--gold)}
+.pill svg{width:22px;height:22px}
+.mission{background:#ffffff10;border:2px solid #ffffff22;border-radius:18px;padding:16px}
+.mission .mrow{display:flex;justify-content:space-between;gap:8px;font-size:15px;margin-top:6px}
+.mbar{height:10px;background:#ffffff22;border-radius:99px;overflow:hidden;margin-top:4px}.mbar i{display:block;height:100%;background:var(--gold)}
+.vakken{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-top:14px}
+@media(max-width:900px){.vakken{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.vak{--c:#17663f;position:relative;text-align:left;border:0;border-radius:20px;padding:16px;min-height:150px;background:var(--c);color:#fff;cursor:pointer;display:flex;flex-direction:column;justify-content:space-between;box-shadow:0 5px 0 color-mix(in srgb,var(--c) 55%,#000);overflow:hidden}
+.vak:hover{transform:translateY(-2px)}
+.vak .ic{width:54px;height:54px}
+.vak .nm{font:800 23px/1.05 "Baloo 2",sans-serif}
+.vak .bk{font-size:13px;color:#ffffffcc}
+.vak .pr{height:8px;background:#ffffff33;border-radius:9px;overflow:hidden;margin-top:8px}.vak .pr i{display:block;height:100%;background:#fff}
+.tools{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;margin-top:14px}
+@media(max-width:900px){.tools{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.tool{display:flex;gap:12px;align-items:center;text-align:left;background:var(--card);border:2px solid var(--line);border-radius:16px;padding:14px;cursor:pointer;min-height:64px}
+.tool:hover{border-color:var(--gold)}
+.tool svg{width:34px;height:34px;flex:none}
+.tool b{display:block;font:600 18px/1.1 "Baloo 2",sans-serif}
+.tool span{font-size:14px;color:var(--muted)}
+.plan{border-left:6px solid var(--gold)}
+/* route */
+.route{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-top:22px}
+.stop{background:none;border:0;color:var(--on);cursor:pointer;display:flex;flex-direction:column;align-items:center;text-align:center;gap:8px;padding:6px;border-radius:16px}
+.stop:hover .ring{transform:translateY(-3px)}
+.ring{width:96px;height:96px;border-radius:50%;display:grid;place-items:center;background:conic-gradient(var(--gold) calc(var(--p)*1%),#ffffff2e 0);transition:transform .2s}
+.ring b{width:74px;height:74px;border-radius:50%;background:var(--card);color:var(--vk);display:grid;place-items:center;font:800 34px/1 "Baloo 2",sans-serif}
+.stop .nm{font:600 18px/1.15 "Baloo 2",sans-serif}
+.stop .sc{font-size:14px;color:#ffffffcc}
+.stop .txt{display:flex;flex-direction:column;gap:2px}
+@media(max-width:520px){.route{grid-template-columns:minmax(0,1fr)}.stop{flex-direction:row;text-align:left;gap:14px}.ring{width:66px;height:66px;flex:none}.ring b{width:50px;height:50px;font-size:24px}}
+.chk{display:inline-flex;gap:8px;align-items:center;border:2px solid var(--line);border-radius:12px;padding:8px 12px;cursor:pointer;min-height:44px;background:var(--card)}
+.chk input{width:20px;height:20px;accent-color:var(--vk)}
+/* tabs */
+.tabs{display:flex;gap:6px;margin-top:18px;flex-wrap:wrap}
+.tab{background:#ffffff1f;color:var(--on);border:0;border-radius:12px 12px 0 0;padding:10px 16px;min-height:46px;font-weight:700;cursor:pointer}
+.tab[aria-selected=true]{background:var(--bg);color:var(--ink)}
+/* learn */
+.para{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,8fr);gap:22px;background:var(--card);border:2px solid var(--line);border-radius:20px;padding:22px;margin-bottom:18px}
+.pn{display:inline-block;background:var(--vk);color:var(--on);border-radius:8px;padding:0 9px;font:800 17px/1.6 "Baloo 2",sans-serif;margin-bottom:8px}
+.para ul,.para ol{margin:.5em 0;padding-left:1.25em}
+.para li{margin:.2em 0}
+.ex{background:var(--goldsoft);border-radius:14px;padding:12px 16px;margin:10px 0}
+.ex>b:first-child,.trick>b:first-child,.warn>b:first-child{display:block}
+.trick{border:2px dashed var(--vk);border-radius:14px;padding:10px 16px;margin:10px 0}
+.warn{border-left:5px solid var(--bad);padding:8px 14px;margin:10px 0;background:var(--badsoft);border-radius:0 12px 12px 0}
+.tbl{border-collapse:collapse;margin:10px 0;font-size:16px}
+.tbl td,.tbl th{border:1.5px solid var(--line);padding:5px 10px;text-align:left;vertical-align:top}
+.tbl th{background:color-mix(in srgb,var(--vk) 14%,transparent)}
+.scroll{overflow-x:auto}
+@media(max-width:760px){.para{grid-template-columns:minmax(0,1fr);gap:8px}}
+.fr{display:inline-flex;flex-direction:column;vertical-align:middle;text-align:center;font-size:.92em;line-height:1.15;margin:0 .12em}
+.fr>span:first-child{border-bottom:2px solid currentColor;padding:0 .2em}
+i.v{font-family:Georgia,serif}
+/* practice */
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.chip{border:2px solid var(--line);background:var(--card);border-radius:999px;padding:7px 14px;min-height:42px;cursor:pointer;font-weight:700}
+.chip[aria-pressed=true]{background:var(--vk);border-color:var(--vk);color:var(--on)}
+@media(max-width:600px){.chip .ct{display:none}}
+.sheet{position:relative;background:var(--card);border:2px solid var(--line);border-radius:22px;padding:clamp(18px,3vw,32px);box-shadow:0 6px 0 var(--line);transition:box-shadow .4s,border-color .4s}
+.sheet.a1{border-color:#5aa9ff;box-shadow:0 0 0 4px #5aa9ff33,0 0 26px #5aa9ff55}
+.sheet.a2{border-color:#f7b500;box-shadow:0 0 0 5px #f7b50044,0 0 34px #f7b50088}
+.sheet.a3{border-color:#c06bff;box-shadow:0 0 0 6px #c06bff44,0 0 44px #c06bff88}
+.qhead{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;color:var(--muted);font-size:15px;margin-bottom:10px}
+.combo{font-weight:700;color:var(--ink)}
+.rprog{display:flex;gap:4px;margin-bottom:14px}
+.rprog i{flex:1;height:10px;border-radius:9px;background:var(--grid)}
+.rprog i.ok{background:var(--good)}.rprog i.no{background:var(--bad)}.rprog i.now{background:var(--gold)}
+.big{font-size:clamp(20px,2.5vw,26px);line-height:1.4}
+.pic{margin:14px 0;display:flex;justify-content:center}
+.pic svg{width:100%;max-width:360px;height:auto;display:block}
+.pic svg.wide{max-width:520px}
+.pic svg text{font-family:"Atkinson Hyperlegible",sans-serif;fill:var(--ink)}
+.ans{display:flex;gap:10px;align-items:center;margin-top:16px}
+.ans input{font-size:22px;padding:10px 14px;border:3px solid var(--line);border-radius:14px;background:var(--bg);color:var(--ink);flex:0 1 340px;width:100%;min-height:54px}
+.ans input:focus{border-color:var(--vk);outline:none}
+.opts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:16px}
+@media(max-width:560px){.opts{grid-template-columns:minmax(0,1fr)}}
+.opt{text-align:left;border:3px solid var(--line);background:var(--bg);border-radius:14px;padding:12px 16px;min-height:54px;font-size:19px;cursor:pointer}
+.opt:hover{border-color:var(--vk)}
+.opt.sel{border-color:var(--vk);background:var(--goodsoft)}
+.opt.right{border-color:var(--good);background:var(--goodsoft)}
+.opt.wrong{border-color:var(--bad);background:var(--badsoft)}
+.kl{margin-top:14px}
+.kl textarea{width:100%;min-height:96px;border:2px dashed var(--line);border-radius:14px;padding:10px 12px;background:var(--bg);font:17px/1.5 "Atkinson Hyperlegible",sans-serif;resize:vertical}
+.kl label{font-weight:700;font-size:15px}
+.uitmode{display:flex;gap:6px;flex-wrap:wrap;align-items:center;font-size:15px;color:var(--muted)}
+.fb{margin-top:16px;border-radius:16px;padding:14px 18px}
+.fb.ok{background:var(--goodsoft)}.fb.no{background:var(--badsoft)}
+.fb h3{margin-bottom:4px}
+.steps2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px;margin-top:8px}
+@media(max-width:600px){.steps2{grid-template-columns:minmax(0,1fr)}}
+.steps2 pre{white-space:pre-wrap;font:16px/1.5 "Atkinson Hyperlegible",sans-serif;margin:4px 0 0;background:var(--card);border-radius:10px;padding:8px 10px}
+.grade{display:flex;gap:24px;align-items:center;flex-wrap:wrap}
+.grade .g{font:800 clamp(72px,12vw,110px)/1 "Baloo 2",sans-serif;color:var(--good)}
+.grade .g.low{color:var(--bad)}
+.rev{border-top:2px solid var(--line);padding:16px 0}
+.rev .mark{font-weight:700}
+.rev .mark.no{color:var(--bad)}.rev .mark.ok{color:var(--good)}
+.rev .pic svg{max-width:240px}
+.rev .big{font-size:19px}
+/* flashcards */
+.fc{perspective:1200px;max-width:620px;margin:0 auto}
+.fcin{position:relative;min-height:260px;transition:transform .45s;transform-style:preserve-3d;cursor:pointer}
+.fc.flip .fcin{transform:rotateY(180deg)}
+.fside{position:absolute;inset:0;backface-visibility:hidden;border-radius:22px;border:3px solid var(--line);background:var(--card);display:grid;place-items:center;text-align:center;padding:24px;font:600 clamp(24px,3.6vw,34px)/1.25 "Baloo 2",sans-serif;box-shadow:0 6px 0 var(--line)}
+.fside.back{transform:rotateY(180deg);border-color:var(--vk);font:400 21px/1.45 "Atkinson Hyperlegible",sans-serif}
+.fside small{display:block;font:14px "Atkinson Hyperlegible",sans-serif;color:var(--muted);margin-top:10px}
+.boxes{display:flex;gap:6px;justify-content:center;margin:12px 0}
+.boxes span{font-size:13px;border:2px solid var(--line);border-radius:10px;padding:2px 8px}
+/* badges */
+.badges{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;margin-top:12px}
+.bdg{background:var(--card);border:2px solid var(--line);border-radius:16px;padding:12px;text-align:center}
+.bdg svg{width:64px;height:64px}
+.bdg.off{opacity:.42;filter:grayscale(1)}
+.bdg b{display:block;font:600 17px/1.15 "Baloo 2",sans-serif;margin-top:4px}
+.bdg span{font-size:13px;color:var(--muted)}
+.vbars{display:grid;gap:8px;margin-top:10px}
+.vb{display:grid;grid-template-columns:9em minmax(0,1fr) 4em;gap:10px;align-items:center;font-size:15px}
+.vb .t{height:14px;background:var(--grid);border-radius:9px;overflow:hidden}.vb .t i{display:block;height:100%}
+.vb .n{text-align:right;white-space:nowrap}
+/* forms */
+.field{display:flex;flex-direction:column;gap:4px;margin:10px 0}
+.field select,.field input{font-size:17px;padding:10px 12px;border:2px solid var(--line);border-radius:12px;background:var(--bg);min-height:46px;max-width:340px}
+/* tools drawer */
+.fab{position:fixed;right:max(16px,env(safe-area-inset-right,0px));bottom:max(16px,env(safe-area-inset-bottom,0px));z-index:30;background:var(--night);color:#fff;border:3px solid var(--gold);border-radius:999px;padding:12px 20px;min-height:54px;font-weight:700;cursor:pointer;display:flex;gap:8px;align-items:center;box-shadow:0 6px 18px #0005}
+.fab svg{width:24px;height:24px}
+.drawer{position:fixed;right:max(12px,env(safe-area-inset-right,0px));bottom:84px;z-index:31;width:min(380px,calc(100vw - 24px));max-height:calc(100svh - 110px);overflow:auto;background:var(--card);border:2px solid var(--line);border-radius:20px;box-shadow:0 18px 50px #0006;padding:14px}
+.dtabs{display:flex;gap:6px;margin-bottom:12px}
+.dtabs button{flex:1;border:2px solid var(--line);background:var(--bg);border-radius:12px;min-height:42px;font-weight:700;cursor:pointer}
+.dtabs button[aria-pressed=true]{background:var(--night);color:#fff;border-color:var(--night)}
+.calc input{width:100%;font-size:24px;text-align:right;padding:10px 12px;border:2px solid var(--line);border-radius:12px;background:var(--bg)}
+.calc .res{text-align:right;font:800 30px/1.2 "Baloo 2",sans-serif;min-height:40px;margin:6px 2px;overflow-wrap:anywhere}
+.keys{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px}
+.keys button{min-height:48px;border:2px solid var(--line);border-radius:12px;background:var(--bg);font-size:19px;font-weight:700;cursor:pointer}
+.keys button.op{background:color-mix(in srgb,var(--gold) 22%,var(--bg))}
+.keys button.eq{background:var(--gold);color:#2b2100;border-color:#b88700}
+.hist{font-size:14px;color:var(--muted);margin-top:8px}
+.timer{text-align:center}
+.timer svg{width:190px;height:190px}
+.timer .tt{font:800 42px/1 "Baloo 2",sans-serif}
+.mini{position:fixed;left:50%;transform:translateX(-50%);top:10px;z-index:29;background:var(--night);color:#fff;border:2px solid var(--gold);border-radius:999px;padding:4px 14px;font-weight:700;font-size:15px;cursor:pointer}
+/* fx overlay */
+.fx{position:fixed;inset:0;z-index:50;display:grid;place-items:center;background:#0a1220cc;cursor:pointer;animation:fin .2s}
+.fx .box{text-align:center;color:#fff;padding:20px;max-width:92vw}
+.fx svg{width:min(560px,90vw);height:auto;display:block;margin:0 auto}
+.fx h2{font-size:clamp(40px,8vw,76px);color:var(--gold);margin-top:6px;text-shadow:0 0 24px #f7b50088}
+.fx p{font-size:20px;max-width:34ch;margin:8px auto 0}
+.beam{animation:beam .9s ease-out both}
+.pulse{animation:pulse 1.2s ease-in-out infinite;transform-origin:center;transform-box:fill-box}
+@keyframes fin{from{opacity:0}to{opacity:1}}
+@keyframes beam{from{transform:scaleX(0);transform-origin:left}to{transform:scaleX(1);transform-origin:left}}
+@keyframes pulse{50%{transform:scale(1.08)}}
+.toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);z-index:40;background:var(--night);color:#fff;border:2px solid var(--gold);border-radius:16px;padding:10px 18px;font-weight:700;max-width:92vw;text-align:center}
+.dlg{position:fixed;inset:0;z-index:60;background:#0008;display:grid;place-items:center;padding:16px}
+.dlg .card{max-width:420px}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+/* ================= core: shared helpers for all subject files ================= */
+window.HUB={vakken:[],P:{},u:{}};
+{
+const u=HUB.u;
+u.ri=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
+u.pick=a=>a[Math.floor(Math.random()*a.length)];
+u.shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+u.gcd=(a,b)=>{a=Math.abs(a);b=Math.abs(b);while(b){[a,b]=[b,a%b]}return a||1};
+u.lcm=(a,b)=>a/u.gcd(a,b)*b;
+u.red=(n,d)=>{if(d<0){n=-n;d=-d}const g=u.gcd(n,d);return [n/g,d/g]};
+u.M='−';const M=u.M;
+u.sn=x=>x<0?M+(-x):''+x;
+u.pn=x=>x<0?'('+M+(-x)+')':''+x;
+u.dec=x=>String(Math.round(x*1e6)/1e6).replace('.',',').replace('-',M);
+u.eur=x=>'€ '+x.toFixed(2).replace('.',',');
+u.big=n=>String(n).replace(/\B(?=(\d{3})+(?!\d))/g,'.');
+u.fr=(n,d)=>`<span class="fr"><span>${n}</span><span>${d}</span></span>`;
+u.frS=(n,d)=>d===1?u.sn(n):(n<0?M:'')+u.fr(Math.abs(n),d);
+u.frMixed=(n,d)=>{const s=n<0?M:'';n=Math.abs(n);if(d===1)return s+n;const w=Math.floor(n/d),r=n%d;return w?`${s}${w} ${u.fr(r,d)}`:s+u.fr(r,d)};
+u.frAns=(n,d)=>{if(d===1)return u.sn(n);return Math.abs(n)>d?`${u.frS(n,d)} = ${u.frMixed(n,d)}`:u.frS(n,d)};
+u.tail=(n,d)=>{const [a,b]=u.red(n,d);return (b!==d||Math.abs(a)>b)?' = '+u.frAns(a,b):''};
+u.V=s=>s.replace(/([a-z])/g,'<i class="v">$1</i>');
+u.esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]);
+u.algShow=terms=>{let o='';terms.forEach(([c,k])=>{if(!c)return;const a=Math.abs(c);const cs=(a===1&&k)?'':a;o+=(c<0?(o?' '+M+' ':M):(o?' + ':''))+cs+k.replace(/([a-z])(\d*)/g,(m,l,p)=>`<i class="v">${l}</i>${p?'<sup>'+p+'</sup>':''}`)});return o||'0'};
+/* question builders */
+u.num=(q,ans,uit,o={})=>({type:'num',q,ans,uit,show:o.show||u.dec(ans),unit:o.unit||'',svg:o.svg,tol:o.tol||1e-6,hard:o.hard});
+u.mc=(q,right,wrongs,uit,o={})=>{const all=[right,...wrongs].filter((v,i,a)=>a.indexOf(v)===i);const opts=u.shuffle([right,...u.shuffle(all.slice(1)).slice(0,(o.n||4)-1)]);return {type:'mc',q,ans:right,opts,uit,show:right,svg:o.svg,hard:o.hard}};
+u.frq=(q,n,d,uit,o={})=>{[n,d]=u.red(n,d);return {type:'frac',q,ans:[n,d],uit,show:u.frAns(n,d),svg:o.svg,hard:o.hard}};
+u.coq=(q,x,y,uit,o={})=>({type:'coord',q,ans:[x,y],uit,show:`(${u.sn(x)}, ${u.sn(y)})`,svg:o.svg});
+u.alq=(q,terms,uit,o={})=>{const map={};terms.forEach(([c,k])=>{if(c)map[k]=(map[k]||0)+c});return {type:'alg',q,ans:map,uit,show:u.algShow(terms),hard:o.hard}};
+u.txt=(q,answers,uit,o={})=>{answers=[].concat(answers);return {type:'txt',q,ans:answers,uit,show:o.show||answers[0],strict:o.strict,hard:o.hard,svg:o.svg,ph:o.ph}};
+/* static question arrays -> objects */
+u.fromStatic=a=>{const [t,q,x,y,z,o]=a;if(t==='mc')return u.mc(q,x,y,z,o||{});if(t==='txt')return u.txt(q,x,y,z||{});if(t==='num')return u.num(q,x,y,z||{});return null};
+/* svg basics */
+u.S=(vb,inner,cls='')=>`<svg viewBox="${vb}" class="${cls}" role="img" aria-label="tekening bij de vraag">${inner}</svg>`;
+u.st='stroke="var(--ink)" stroke-width="2.5" fill="none" stroke-linejoin="round" stroke-linecap="round"';
+u.hid='stroke="var(--ink)" stroke-width="2" fill="none" stroke-dasharray="6 5"';
+u.face='fill="color-mix(in srgb,var(--vk) 22%,transparent)"';
+u.face2='fill="color-mix(in srgb,var(--vk) 40%,transparent)"';
+u.P2=a=>a.map(p=>p.join(',')).join(' ');
+HUB.vak=v=>{HUB.vakken.push(v);v.chs.forEach(ch=>{ch.vak=v.id;ch.key=v.id+'-'+ch.id;ch.ps.forEach(p=>{p.vak=v.id;p.ch=ch.id;p.key=v.id+':'+p.id;HUB.P[p.key]=p})})};
+}
+</script>
+<script src="vakken/wiskunde.js"></script>
+<script src="vakken/nederlands.js"></script>
+<script src="vakken/engels.js"></script>
+<script src="vakken/frans.js"></script>
+<script src="vakken/geschiedenis.js"></script>
+<script src="vakken/aardrijkskunde.js"></script>
+<script src="vakken/biologie.js"></script>
+<script>
+{
+const u=HUB.u;const {ri,pick,shuffle,dec,esc,M}=u;
+/* ================= checking ================= */
+const clean=s=>String(s).trim().replace(/[−–—]/g,'-');
+function parseNum(s){s=clean(s).replace(/(\d)\s*e\b/gi,'$1').replace(/€|euro|°c|°|%|cm|km²|km|graden|uur|dagen|keer|jaar|eeuw|v\.?\s?chr\.?|n\.?\s?chr\.?|inwoners|per|x\b/gi,'').replace(/\s+/g,'');if(!s)return NaN;if(/^-?\d{1,3}(\.\d{3})+(,\d+)?$/.test(s))s=s.replace(/\./g,'');s=s.replace(',','.');if(!/^-?\d*\.?\d+$/.test(s))return NaN;return Number(s)}
+function parseFrac(s){s=clean(s);let m;
+ if(m=s.match(/^(-)?\s*(\d+)\s+(\d+)\s*\/\s*(\d+)$/)){const d=+m[4];if(!d)return null;return {n:(m[1]?-1:1)*(+m[2]*d+ +m[3]),d,mixed:true,r:+m[3]}}
+ if(m=s.match(/^(-)?\s*(\d+)\s*\/\s*(\d+)$/)){const d=+m[3];if(!d)return null;return {n:(m[1]?-1:1)*+m[2],d}}
+ if(m=s.match(/^(-)?\s*(\d+)$/))return {n:(m[1]?-1:1)*+m[2],d:1};return null}
+function parseAlg(s){s=clean(s).toLowerCase().replace(/[\s·*×]/g,'').replace(/²/g,'^2').replace(/³/g,'^3');if(!s)return null;
+ const terms=s.match(/[+-]?[^+-]+/g);if(!terms||terms.join('')!==s)return null;const map={};let simple=true;
+ for(const t of terms){const m=t.match(/^([+-]?)(\d+(?:[.,]\d+)?)?((?:[a-z](?:\^\d+)?)*)$/);if(!m||(!m[2]&&!m[3]))return null;
+  let c=m[2]?Number(m[2].replace(',','.')):1;if(m[1]==='-')c=-c;const pw={};
+  (m[3].match(/[a-z](\^\d+)?/g)||[]).forEach(x=>{const l=x[0];const p=x.length>1?+x.slice(2):1;if(pw[l])simple=false;pw[l]=(pw[l]||0)+p});
+  const key=Object.keys(pw).sort().map(l=>l+(pw[l]>1?pw[l]:'')).join('');if(key in map)simple=false;map[key]=(map[key]||0)+c;if(c===0)simple=false}
+ return {map,simple}}
+const deacc=s=>s.normalize('NFD').replace(/[̀-ͯ]/g,'');
+const normT=s=>clean(s).toLowerCase().replace(/[’‘`]/g,"'").replace(/,/g,' ').replace(/\s+/g,' ').replace(/[.!?]+$/,'').trim();
+const lev=(a,b)=>{const d=[...Array(b.length+1).keys()];for(let i=1;i<=a.length;i++){let p=d[0];d[0]=i;for(let j=1;j<=b.length;j++){const t=d[j];d[j]=Math.min(d[j]+1,d[j-1]+1,p+(a[i-1]===b[j-1]?0:1));p=t}}return d[b.length]};
+function check(q,raw){
+ const r=String(raw??'').trim();if(!r)return {ok:false,empty:true};
+ if(q.type==='mc')return {ok:r===q.ans};
+ if(q.type==='num'){const v=parseNum(r);if(isNaN(v))return {ok:false,fmt:true,msg:'Typ alleen een getal, bijvoorbeeld 12 of 3,5.'};return {ok:Math.abs(v-q.ans)<q.tol}}
+ if(q.type==='frac'){const f=parseFrac(r);if(!f)return {ok:false,fmt:true,msg:'Schrijf een breuk zo: 3/4, of met helen zo: 2 1/3.'};
+  const [n,d]=q.ans;if(f.n*d!==n*f.d)return {ok:false};
+  if(q.form==='mixed'&&!f.mixed)return {ok:false,msg:'De waarde klopt, maar je moest de helen eruit halen, zoals 3 2/5.'};
+  if(q.form==='improper'&&f.mixed)return {ok:false,msg:'De waarde klopt, maar je moest de helen in de breuk zetten, zoals 11/4.'};
+  if(f.mixed){if(f.r>=f.d||u.gcd(f.r,f.d)!==1)return {ok:false,msg:'De waarde klopt, maar het kan nog eenvoudiger.'};return {ok:true}}
+  if(u.gcd(f.n,f.d)!==1)return {ok:false,msg:'De waarde klopt, maar je kunt de breuk nog vereenvoudigen.'};return {ok:true}}
+ if(q.type==='coord'){const m=clean(r).match(/^\(?\s*(-?\d+)\s*[,;]\s*(-?\d+)\s*\)?$/);if(!m)return {ok:false,fmt:true,msg:'Schrijf het zo: (3, -2). Eerst x, dan y.'};const x=+m[1],y=+m[2];if(x===q.ans[1]&&y===q.ans[0]&&x!==y)return {ok:false,msg:'Je hebt x en y omgewisseld. Eerst opzij (x), dan omhoog of omlaag (y).'};return {ok:x===q.ans[0]&&y===q.ans[1]}}
+ if(q.type==='alg'){const a=parseAlg(r);if(!a)return {ok:false,fmt:true,msg:'Schrijf het zo: 3a + 5b of 12ab of 6x².'};
+  const ks=new Set([...Object.keys(a.map),...Object.keys(q.ans)]);let same=true;ks.forEach(k=>{if(Math.abs((a.map[k]||0)-(q.ans[k]||0))>1e-9)same=false});
+  if(!same)return {ok:false};if(!a.simple)return {ok:false,msg:'Het klopt, maar je kunt het nog verder herleiden.'};return {ok:true}}
+ if(q.type==='txt'){const n=normT(r);const A=q.ans.map(normT);if(A.includes(n))return {ok:true};
+  const na=deacc(n);const ia=A.findIndex(a=>deacc(a)===na);if(ia>=0)return {ok:true,warn:'Let op de accenten! Precies goed is: <b>'+esc(q.ans[ia])+'</b>'};
+  if(!q.strict){const il=A.findIndex(a=>a.length>=6&&lev(deacc(a),na)<=1);if(il>=0)return {ok:true,warn:'Kleine typfout. Precies goed is: <b>'+esc(q.ans[il])+'</b>'}}
+  return {ok:false}}
+ return {ok:false};
+}
+HUB.check=check;HUB.parse={parseNum,parseFrac,parseAlg};
+
+/* ================= storage ================= */
+const KEY='adam-hub-v2';
+const fresh=()=>({v:2,xp:0,p:{},best:{},last:{},fouten:[],cards:{},badges:{},days:{},streakDays:0,lastDay:'',bestCombo:0,tot:{g:0,f:0,uit:0,cards:0,fixed:0},vakDone:{},plans:[],notes:'',set:{sound:true,uit:'papier'}});
+let D=fresh();
+try{const s=JSON.parse(localStorage.getItem(KEY)||'null');if(s&&s.v===2)D=Object.assign(fresh(),s)}catch(e){}
+try{localStorage.removeItem('adam-wiskunde-v1')}catch(e){}
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(D))}catch(e){}};
+const iso=d=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+const today=()=>iso(new Date());
+const dayRec=()=>{const t=today();D.days[t]=D.days[t]||{g:0,cards:0,done:false};return D.days[t]};
+function touchDay(){const t=today();if(D.lastDay===t)return;const y=new Date();y.setDate(y.getDate()-1);D.streakDays=(D.lastDay===iso(y))?D.streakDays+1:1;D.lastDay=t;if(D.streakDays>=3)badge('d3');if(D.streakDays>=7)badge('d7')}
+
+/* ================= game ================= */
+const need=n=>25*n*(n-1);
+const level=xp=>{let n=1;while(need(n+1)<=xp)n++;return n};
+const RANKS=[[1,'Academie-leerling'],[3,'Genin'],[6,'Chūnin'],[10,'Jōnin'],[15,'Anbu'],[20,'Sannin'],[26,'Kage'],[35,'Legende']];
+const rank=l=>RANKS.filter(r=>r[0]<=l).pop()[1];
+const power=()=>D.xp*3+5;
+const BADGES=[['eerste','Eerste jutsu','Je eerste goede antwoord'],['r10','Schaduwklonen','10 goed op rij'],['r20','Ultra Instinct','20 goed op rij'],['t8','Chūnin-examen','Een 8 of hoger op een oefentoets'],['t10','Hokage-niveau','Een 10 op een oefentoets'],['vak7','Nakama','In alle 7 vakken geoefend'],['d3','Vuur van de wil','3 dagen op rij geleerd'],['d7','Time Chamber','7 dagen op rij geleerd'],['g100','Dojo-meester','100 vragen goed'],['g500','Legendarische training','500 vragen goed'],['fix10','Foutenjager','10 fouten weggewerkt'],['uit25','Strateeg','25 keer je stappen uitgeschreven'],['k100','Geheugen van staal','100 flitskaarten gedaan'],['missie','Missie voltooid','Een dagmissie gehaald'],['p9000','Boven de 9000','Kracht-level boven de 9000'],['focus','Focus-ninja','Een focusronde afgemaakt']];
+let toastT;
+function toast(h){let t=document.querySelector('.toast');if(!t){t=document.createElement('div');t.className='toast';document.body.appendChild(t)}t.innerHTML=h;clearTimeout(toastT);toastT=setTimeout(()=>t.remove(),2600)}
+function badge(id){if(D.badges[id])return;D.badges[id]=today();const b=BADGES.find(x=>x[0]===id);if(b)setTimeout(()=>{toast(`Badge verdiend: <b>${b[1]}</b>`);sfx('lvl')},900);save()}
+function addXP(n){const l0=level(D.xp),p0=power();D.xp+=n;const l1=level(D.xp);if(l1>l0){const r0=rank(l0),r1=rank(l1);setTimeout(()=>fx('level',r1!==r0?`Rang omhoog: ${r1}!`:`Level ${l1}!`,r1!==r0?`Je bent nu ${r1}. Je training werkt, Adam.`:`Nog ${need(l1+1)-D.xp} XP tot level ${l1+1}.`),700)}
+ if(p0<=9000&&power()>9000){badge('p9000');setTimeout(()=>fx('beam','Boven de 9000!','Je kracht-level is gemeten: het is over 9000.'),1400)}save()}
+const GOED=['Goed zo!','Raak!','Yes, helemaal goed!','Strak, Adam!','Dat zit erin!','Netjes!','Rasengan, raak!','Dattebayo, goed!','Zoro-slag: in één keer raak.','Clean, zoals Itachi.','Vegeta zou jaloers zijn.','Luffy zou zeggen: op naar de volgende!','Gear up, die was goed!','Sharingan-blik: je zag het meteen.'];
+const FOUT=['Nog niet. Ook Naruto zakte eerst voor zijn examen.','Bijna. Rock Lee gaf ook nooit op: lees de uitwerking en ga door.','Geen stress. Lees hoe het moet en pak de volgende.','Elke fout maakt je sterker. Zo werkt training.','Even resetten, Adam. Lees de uitleg, dan de volgende.','Zoro verdwaalt ook weleens. Kijk hoe het moet.'];
+const COMBO={3:'Je chakra laadt op: 3 op rij!',5:'Je begint op Shikamaru te lijken: 5 op rij, 200 IQ!',7:'Gear Second: 7 op rij!',10:'Super Saiyan-modus: 10 op rij!',15:'Sage Mode geactiveerd: 15 op rij!',20:'Ultra Instinct: 20 op rij. Niemand houdt je tegen!'};
+const HARD=[['KAMEHAMEHA!','Dit was een moeilijke en je hebt hem. Goku-niveau, Adam!'],['RASENGAN!','Moeilijke vraag, perfect geraakt. Naruto zou trots zijn.'],['GOMU GOMU NO... RAAK!','Lastige vraag goed. Luffy-energie!'],['FINAL FLASH!','Zelfs Vegeta zou dit een sterke move vinden.']];
+const GREET=()=>{const h=new Date().getHours();return pick([`Yo Adam! Zin om de slimste van de klas te worden?`,`Yo Adam, klaar voor je training van ${h<12?'vanochtend':h<18?'vanmiddag':'vanavond'}?`,`Welkom terug, Adam. Elke dag een beetje sterker.`,`Yo Adam! Tijd om je kracht-level op te pompen.`])};
+
+/* ================= sound ================= */
+let AC=null;
+function sfx(k){if(!D.set.sound)return;try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();const notes={ok:[660,880],no:[300,220],lvl:[523,659,784,1046],beam:[220,330,440,660,880],tick:[880]}[k]||[600];notes.forEach((f,i)=>{const o=AC.createOscillator(),g=AC.createGain();o.type=k==='no'?'sine':'triangle';o.frequency.value=f;g.gain.setValueAtTime(.0001,AC.currentTime+i*.09);g.gain.exponentialRampToValueAtTime(.18,AC.currentTime+i*.09+.02);g.gain.exponentialRampToValueAtTime(.0001,AC.currentTime+i*.09+.25);o.connect(g).connect(AC.destination);o.start(AC.currentTime+i*.09);o.stop(AC.currentTime+i*.09+.3)})}catch(e){}}
+
+/* ================= visual fx (own artwork, no existing characters) ================= */
+const ART={
+ beam:`<svg viewBox="0 0 560 220"><defs><radialGradient id="orb"><stop offset="0" stop-color="#fff"/><stop offset=".45" stop-color="#9fe4ff"/><stop offset="1" stop-color="#2a8cff" stop-opacity="0"/></radialGradient><linearGradient id="bm" x1="0" x2="1"><stop offset="0" stop-color="#e8fbff"/><stop offset=".6" stop-color="#6fd0ff"/><stop offset="1" stop-color="#2a8cff" stop-opacity=".2"/></linearGradient></defs><g class="beam"><rect x="80" y="82" width="480" height="56" rx="28" fill="url(#bm)"/><rect x="80" y="98" width="470" height="24" rx="12" fill="#fff" opacity=".9"/></g><circle class="pulse" cx="86" cy="110" r="74" fill="url(#orb)"/>${[...Array(14)].map((_,i)=>`<line x1="${86+80*Math.cos(i/14*6.28)}" y1="${110+80*Math.sin(i/14*6.28)}" x2="${86+105*Math.cos(i/14*6.28)}" y2="${110+105*Math.sin(i/14*6.28)}" stroke="#9fe4ff" stroke-width="4" stroke-linecap="round"/>`).join('')}</svg>`,
+ level:`<svg viewBox="0 0 560 220"><rect x="120" y="40" width="320" height="140" rx="10" fill="#f6e7c1"/><rect x="96" y="30" width="34" height="160" rx="17" fill="#b9853a"/><rect x="430" y="30" width="34" height="160" rx="17" fill="#b9853a"/><rect x="150" y="66" width="260" height="10" rx="5" fill="#d9c08a"/><rect x="150" y="96" width="210" height="10" rx="5" fill="#d9c08a"/><rect x="150" y="126" width="240" height="10" rx="5" fill="#d9c08a"/><g class="pulse"><circle cx="400" cy="150" r="34" fill="#c4304b"/><path d="M400 128l7 15 16 2-12 11 3 16-14-8-14 8 3-16-12-11 16-2z" fill="#ffd75e"/></g></svg>`,
+ flame:`<svg viewBox="0 0 560 220"><g class="pulse"><path d="M280 20c40 50 90 80 90 130a90 70 0 0 1-180 0c0-30 20-50 40-70 0 30 10 45 25 50-10-40 0-80 25-110z" fill="#ff7a1a"/><path d="M282 80c24 30 50 50 50 80a52 40 0 0 1-104 0c0-20 14-30 26-44 2 18 8 26 16 30-4-26 2-48 12-66z" fill="#ffd75e"/></g></svg>`,
+ timer:`<svg viewBox="0 0 560 220"><circle cx="280" cy="115" r="86" fill="none" stroke="#f7b500" stroke-width="16"/><path d="M280 115V55M280 115l40 26" stroke="#fff" stroke-width="10" stroke-linecap="round"/><rect x="262" y="12" width="36" height="18" rx="6" fill="#f7b500"/></svg>`
+};
+function fx(kind,title,sub){sfx(kind==='beam'?'beam':'lvl');const d=document.createElement('div');d.className='fx';d.innerHTML=`<div class="box">${ART[kind]||ART.level}<h2>${title}</h2><p>${sub||''}</p><p class="tip" style="color:#ffffffaa">Tik om verder te gaan</p></div>`;d.onclick=()=>d.remove();document.body.appendChild(d);setTimeout(()=>d.remove(),3200)}
+
+/* ================= icons ================= */
+const IC={
+ wi:`<svg viewBox="0 0 54 54"><rect x="6" y="6" width="42" height="42" rx="10" fill="#ffffff2a"/><path d="M15 27h24M27 15v24" stroke="#fff" stroke-width="5" stroke-linecap="round"/><circle cx="40" cy="40" r="5" fill="#f7b500"/></svg>`,
+ ne:`<svg viewBox="0 0 54 54"><path d="M8 12h38v24H24l-10 9v-9H8z" fill="#ffffff2a" stroke="#fff" stroke-width="3" stroke-linejoin="round"/><text x="27" y="30" font-size="15" font-weight="800" text-anchor="middle" fill="#fff" font-family="Baloo 2,sans-serif">Aa</text></svg>`,
+ en:`<svg viewBox="0 0 54 54"><path d="M8 12h38v24H24l-10 9v-9H8z" fill="#ffffff2a" stroke="#fff" stroke-width="3" stroke-linejoin="round"/><text x="27" y="30" font-size="15" font-weight="800" text-anchor="middle" fill="#fff" font-family="Baloo 2,sans-serif">Hi!</text></svg>`,
+ fr:`<svg viewBox="0 0 54 54"><path d="M27 6l-4 14h8zM22 20l-6 26M32 20l6 26M19 33h16M14 46h26" stroke="#fff" stroke-width="3.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+ gs:`<svg viewBox="0 0 54 54"><path d="M8 18L27 8l19 10z" fill="#fff"/><rect x="11" y="20" width="32" height="4" fill="#fff"/><path d="M15 26v14M23 26v14M31 26v14M39 26v14" stroke="#fff" stroke-width="4"/><rect x="9" y="42" width="36" height="5" rx="1" fill="#fff"/></svg>`,
+ ak:`<svg viewBox="0 0 54 54"><circle cx="27" cy="27" r="19" fill="#ffffff2a" stroke="#fff" stroke-width="3"/><path d="M8 27h38M27 8c-8 10-8 28 0 38M27 8c8 10 8 28 0 38" stroke="#fff" stroke-width="2.5" fill="none"/></svg>`,
+ bi:`<svg viewBox="0 0 54 54"><path d="M10 44C10 22 24 10 44 10c0 22-12 34-34 34z" fill="#ffffff2a" stroke="#fff" stroke-width="3"/><path d="M10 44L36 18" stroke="#fff" stroke-width="3"/><circle cx="30" cy="30" r="3" fill="#f7b500"/></svg>`
+};
+const TI={
+ calc:`<svg viewBox="0 0 34 34"><rect x="6" y="3" width="22" height="28" rx="4" fill="var(--night)"/><rect x="9" y="6" width="16" height="6" rx="1.5" fill="#9fe4ff"/>${[0,1,2].map(r=>[0,1,2].map(c=>`<circle cx="${12+c*5}" cy="${17+r*5}" r="1.8" fill="#f7b500"/>`).join('')).join('')}</svg>`,
+ timer:`<svg viewBox="0 0 34 34"><circle cx="17" cy="19" r="11" fill="none" stroke="var(--gold)" stroke-width="4"/><path d="M17 19v-6" stroke="var(--ink)" stroke-width="3" stroke-linecap="round"/><rect x="13" y="2" width="8" height="4" rx="1.5" fill="var(--gold)"/></svg>`,
+ fout:`<svg viewBox="0 0 34 34"><rect x="5" y="4" width="22" height="27" rx="3" fill="var(--bad)"/><path d="M11 12l10 10M21 12L11 22" stroke="#fff" stroke-width="3" stroke-linecap="round"/></svg>`,
+ plan:`<svg viewBox="0 0 34 34"><rect x="4" y="6" width="26" height="24" rx="4" fill="none" stroke="var(--ink)" stroke-width="3"/><path d="M4 13h26M11 3v6M23 3v6" stroke="var(--ink)" stroke-width="3"/><path d="M11 21l4 4 8-8" stroke="var(--good)" stroke-width="3.5" fill="none" stroke-linecap="round"/></svg>`,
+ pad:`<svg viewBox="0 0 34 34"><path d="M17 3l4 9 10 1-7 7 2 10-9-5-9 5 2-10-7-7 10-1z" fill="var(--gold)" stroke="#b88700" stroke-width="1.5"/></svg>`,
+ flame:`<svg viewBox="0 0 24 24"><path d="M12 2c3 4 7 6 7 11a7 6 0 0 1-14 0c0-3 2-5 3-6 0 2 1 3 2 4-1-4 0-6 2-9z" fill="#ff7a1a"/></svg>`,
+ bolt:`<svg viewBox="0 0 24 24"><path d="M13 2L4 14h7l-1 8 9-12h-7z" fill="#f7b500"/></svg>`,
+ star:`<svg viewBox="0 0 24 24"><path d="M12 2l3 7 7 .6-5.4 4.6 1.7 7L12 17.6 5.7 21.2l1.7-7L2 9.6 9 9z" fill="#9fe4ff"/></svg>`
+};
+const medal=(i,on)=>{const hue=[45,200,280,10,140,330][i%6];return `<svg viewBox="0 0 64 64"><path d="M22 4h8l4 14h-8zM42 4h-8l-4 14h8z" fill="hsl(${hue} 60% 40%)"/><polygon points="32,16 50,26 50,46 32,56 14,46 14,26" fill="hsl(${hue} 75% ${on?55:70}%)" stroke="hsl(${hue} 70% 30%)" stroke-width="3"/><path d="M32 26l3.5 7.5 8 .8-6 5.4 1.8 8-7.3-4.3-7.3 4.3 1.8-8-6-5.4 8-.8z" fill="#fff"/></svg>`};
+function emblem(l,frac){const R=58,c=2*Math.PI*R;return `<svg class="emb" viewBox="0 0 132 132"><circle cx="66" cy="66" r="${R}" fill="none" stroke="#ffffff22" stroke-width="10"/><circle cx="66" cy="66" r="${R}" fill="none" stroke="#f7b500" stroke-width="10" stroke-linecap="round" stroke-dasharray="${c*frac} ${c}" transform="rotate(-90 66 66)"/><polygon points="66,22 104,44 104,88 66,110 28,88 28,44" fill="#1f3a5c" stroke="#f7b500" stroke-width="3"/><text x="66" y="62" text-anchor="middle" fill="#ffffffcc" font-size="13" font-family="Atkinson Hyperlegible,sans-serif">level</text><text x="66" y="92" text-anchor="middle" fill="#fff" font-size="36" font-weight="800" font-family="Baloo 2,sans-serif">${l}</text></svg>`}
+
+/* ================= helpers ================= */
+const app=document.getElementById('app');
+const V=id=>HUB.vakken.find(v=>v.id===id);
+const CHK=key=>{const [v,c]=key.split('-');const vk=V(v);return vk&&vk.chs.find(x=>x.id===c)};
+const vkStyle=v=>`style="--vk:${v.kleur}"`;
+const setVk=c=>document.documentElement.style.setProperty('--vk',c||'#17663f');
+const recent=[];
+function makeQ(key){const p=HUB.P[key];let q=null;
+ for(let t=0;t<8;t++){const useGen=p.gen&&(!p.qs||!p.qs.length||Math.random()<.6);if(useGen){q=p.gen()}else{const i=ri(0,p.qs.length-1);const id=key+'#'+i;if(t<7&&recent.includes(id)&&p.qs.length>3)continue;recent.push(id);if(recent.length>30)recent.shift();q=u.fromStatic(p.qs[i])}if(q)break}
+ q.p=key;if(p.strict&&q.type==='txt')q.strict=true;if(p.hard&&q.hard===undefined)q.hard=true;return q}
+const chPct=ch=>{const ps=ch.ps.map(p=>Math.min(1,((D.p[p.key]||{}).g||0)/5));let v=ps.reduce((a,b)=>a+b,0)/ps.length*70;if(D.best[ch.key])v+=Math.min(30,D.best[ch.key]/10*30);return Math.round(v)};
+const vakPct=v=>Math.round(v.chs.reduce((a,c)=>a+chPct(c),0)/v.chs.length);
+const qHtml=q=>`<div class="big">${q.q}</div>${q.svg?`<div class="pic">${q.svg}</div>`:''}`;
+function inputHtml(q){if(q.type==='mc')return `<div class="opts">${q.opts.map((o,i)=>`<button class="opt" data-o="${i}">${o}</button>`).join('')}</div>`;
+ const ph=q.ph||{num:'Typ je antwoord',frac:'bijv. 3/4 of 2 1/3',coord:'bijv. (3, -2)',alg:'bijv. 3a + 5b',txt:'Typ je antwoord'}[q.type];
+ return `<div class="ans"><input id="inp" inputmode="${q.type==='num'?'decimal':'text'}" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="${ph}" aria-label="Je antwoord">${q.unit?`<span>${q.unit}</span>`:''}</div>`}
+const snap=q=>({p:q.p,type:q.type,q:q.q,svg:q.svg,ans:q.ans,opts:q.opts,uit:q.uit,show:q.show,unit:q.unit,form:q.form,strict:q.strict,tol:q.tol,hard:q.hard});
+function addFout(q,raw,notes){D.fouten=D.fouten.filter(f=>f.q.q!==q.q);D.fouten.unshift({q:snap(q),raw:String(raw||''),notes:notes||'',t:today()});if(D.fouten.length>80)D.fouten.length=80}
+function recordAnswer(q,ok){const k=q.p;D.p[k]=D.p[k]||{g:0,f:0};touchDay();const dr=dayRec();
+ if(ok){D.p[k].g++;D.tot.g++;dr.g++;badge('eerste');if(D.tot.g>=100)badge('g100');if(D.tot.g>=500)badge('g500')}else{D.p[k].f++;D.tot.f++}
+ const vk=HUB.P[k].vak;D.vakDone[vk]=1;if(Object.keys(D.vakDone).length>=HUB.vakken.length)badge('vak7');missionCheck()}
+function missionCheck(){const dr=dayRec();if(!dr.done&&dr.g>=15&&dr.cards>=10){dr.done=true;addXP(50);badge('missie');setTimeout(()=>fx('flame','Dagmissie voltooid!','+50 XP. Morgen weer, dan groeit je reeks.'),500)}}
+function shell(opt){setVk(opt.kleur);return `<header class="top${opt.tabs?' ch':''}"><div class="wrap"><div class="bar"><button class="back" data-go="${opt.back||'home'}">${opt.backTxt||'Home'}</button><span class="crumb">${opt.crumb||''}</span></div><h1 style="margin-top:12px">${opt.title}</h1>${opt.sub?`<p>${opt.sub}</p>`:''}${opt.tabs?`<div class="tabs" role="tablist">${opt.tabs.map(([h,l,s])=>`<button class="tab" role="tab" aria-selected="${!!s}" data-go="${h}">${l}</button>`).join('')}</div>`:''}</div></header><main class="wrap" id="body"></main>`}
+function bindGo(root=app){root.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>{location.hash=b.dataset.go})}
+
+/* ================= views ================= */
+function home(){
+ setVk('#17663f');const l=level(D.xp);const lo=need(l),hi=need(l+1);const frac=(D.xp-lo)/(hi-lo);const dr=dayRec();
+ const plans=D.plans.filter(p=>p.date>=today()).sort((a,b)=>a.date<b.date?-1:1);
+ const np=plans[0];let planHtml='';
+ if(np){const vk=V(np.vak);const days=Math.round((new Date(np.date+'T12:00')-new Date(today()+'T12:00'))/864e5);const task=(np.tasks.find(t=>t.d===today())||{}).items||[];
+  planHtml=`<section class="card plan" style="margin-top:22px"><h2>${vk.naam}-toets ${days===0?'is vandaag':days===1?'is morgen':'over '+days+' dagen'}</h2>${task.length?`<p>Vandaag op je planning:</p><div class="row">${task.map(t=>`<button class="btn small sec" data-go="${t.h}">${t.l}</button>`).join('')}</div>`:'<p>Geen taken voor vandaag. Doe een oefentoets als extra.</p>'}<p class="tip"><a href="#planner">Planning bekijken</a></p></section>`}
+ app.innerHTML=`<header class="dojo"><div class="wrap"><div class="dgrid"><div>
+   <div class="greet">${GREET()}</div>
+   <div class="rankbox" style="margin-top:14px">${emblem(l,frac)}<div style="flex:1"><h2 style="color:var(--gold)">${rank(l)}</h2><div class="xpbar"><i style="width:${Math.round(frac*100)}%"></i></div><span class="tip" style="color:#ffffffbb">${D.xp} XP · nog ${hi-D.xp} XP tot level ${l+1}</span></div></div>
+   <div class="stats3"><span class="pill">${TI.bolt}Kracht-level <b>${u.big(power())}</b></span><span class="pill">${TI.flame}Dagen op rij <b>${D.streakDays}</b></span><span class="pill">${TI.star}Beste reeks <b>${D.bestCombo}</b></span></div>
+  </div><div class="mission"><h3 style="color:var(--gold)">Dagmissie</h3><p style="margin:2px 0 8px">Haal vandaag beide doelen voor +50 XP.</p>
+   <div class="mrow"><span>15 vragen goed</span><span>${Math.min(dr.g,15)}/15</span></div><div class="mbar"><i style="width:${Math.min(100,dr.g/15*100)}%"></i></div>
+   <div class="mrow"><span>10 flitskaarten</span><span>${Math.min(dr.cards,10)}/10</span></div><div class="mbar"><i style="width:${Math.min(100,dr.cards/10*100)}%"></i></div>
+   ${dr.done?'<p style="color:var(--gold);font-weight:700;margin-top:10px">Missie voltooid!</p>':`<button class="btn gold" style="margin-top:12px" id="quick">Start snelle training</button>`}</div></div></div></header>
+ <main class="wrap">${planHtml}
+  <h2 style="margin-top:${np?26:0}px">Kies je vak</h2>
+  <div class="vakken">${HUB.vakken.map(v=>`<button class="vak" style="--c:${v.kleur}" data-go="vak-${v.id}"><span class="ic">${IC[v.id]||''}</span><span><span class="nm">${v.naam}</span><br><span class="bk">${v.boek}</span><span class="pr"><i style="width:${vakPct(v)}%"></i></span></span></button>`).join('')}
+   <button class="vak" style="--c:#13233a" data-go="pad"><span class="ic">${TI.pad.replace('viewBox="0 0 34 34"','viewBox="0 0 34 34" width="54" height="54"')}</span><span><span class="nm">Mijn pad</span><br><span class="bk">Badges, rang en voortgang</span></span></button></div>
+  <h2 style="margin-top:28px">Handige tools</h2>
+  <div class="tools">
+   <button class="tool" data-tool="calc">${TI.calc}<span><b>Rekenmachine</b><span>Met haakjes, kwadraat en wortel</span></span></button>
+   <button class="tool" data-tool="timer">${TI.timer}<span><b>Focustimer</b><span>Korte rondes, dan pauze</span></span></button>
+   <button class="tool" data-go="fouten">${TI.fout}<span><b>Foutenboek</b><span>${D.fouten.length} fout${D.fouten.length===1?'':'en'} om weg te werken</span></span></button>
+   <button class="tool" data-go="planner">${TI.plan}<span><b>Toetsplanner</b><span>Toets eraan? Maak een plan</span></span></button>
+   <button class="tool" data-tool="kl">${TI.plan.replace(/var\(--good\)/,'var(--gold)')}<span><b>Kladblok</b><span>Snel iets opschrijven</span></span></button>
+  </div>
+  <section class="card" style="margin-top:28px"><h2>Zo train je slim</h2><ol><li><b>Leer</b>: lees de uitleg van één paragraaf. Kijk vooral naar het trucje en de valkuil.</li><li><b>Oefen</b>: een ronde is 10 vragen. Aan het eind zie je precies wat er fout ging en hoe het wel moet.</li><li><b>Flitskaarten</b>: begrippen en woordjes. Wat je nog niet weet, komt vaker terug.</li><li><b>Oefentoets</b>: zonder hulp, met een cijfer. Daarna je fouten wegwerken in het foutenboek.</li></ol><p class="tip">Werk in rondes van 15 minuten met de focustimer. Liever elke dag een beetje dan één keer heel lang.</p></section>
+  <p class="note">Hoofdstuknummers volgen de boeken van de foto's, maar kunnen bij jouw editie iets anders zijn: kijk dan naar het onderwerp. Je voortgang wordt alleen op dit apparaat bewaard. <button class="btn small sec" id="sett" style="margin-left:6px">Instellingen</button></p>
+ </main>`;
+ bindGo();bindTools();
+ const qk=document.getElementById('quick');if(qk)qk.onclick=()=>{const keys=Object.keys(HUB.P).filter(k=>!CHK(HUB.P[k].vak+'-'+HUB.P[k].ch).later);const w=keys.map(k=>{const s=D.p[k]||{g:0,f:0};return [k,1+s.f*2-Math.min(s.g,5)*.2+(s.g?0:1)]});const pool=shuffle(w.sort((a,b)=>b[1]-a[1]).slice(0,25).map(x=>x[0])).slice(0,12);startPrac({pool,title:'Snelle training',sub:'Vragen uit allerlei vakken, vooral wat je nog lastig vindt.',back:'home',kleur:'#13233a'});location.hash='training'};
+ document.getElementById('sett').onclick=settings;
+}
+function bindTools(){app.querySelectorAll('[data-tool]').forEach(b=>b.onclick=()=>openDrawer(b.dataset.tool))}
+
+function vakView(v){
+ app.innerHTML=shell({kleur:v.kleur,title:v.naam,sub:`${v.boek}. Kies een hoofdstuk. De gele ring laat zien hoe ver je bent.`,crumb:`Totaal ${vakPct(v)}%`});
+ const head=app.querySelector('.top .wrap');head.insertAdjacentHTML('beforeend',`<nav class="route">${v.chs.map(c=>`<button class="stop" data-go="${c.key}"><span class="ring" style="--p:${chPct(c)}"><b>${c.n}</b></span><span class="txt"><span class="nm">${c.t}</span><span class="sc">${D.best[c.key]?'Beste toets: '+dec(D.best[c.key]):c.later?'Komt later':'Nog geen toets'}</span></span></button>`).join('')}</nav>`);
+ const body=document.getElementById('body');
+ body.innerHTML=`${v.intro?`<section class="card" style="margin-bottom:18px">${v.intro}</section>`:''}<section class="card"><h2>Grote oefentoets ${v.naam}</h2><p>15 vragen door elkaar uit de hoofdstukken die je aanvinkt. Handig voor een grote toets of de toetsweek.</p><div class="row" style="margin:12px 0">${v.chs.map(c=>`<label class="chk"><input type="checkbox" id="mx-${c.id}" ${c.later?'':'checked'}> H${c.n} ${c.t}</label>`).join('')}</div><button class="btn gold" id="mixgo">Start oefentoets</button> <button class="btn sec" id="mixpr">Oefenronde uit deze hoofdstukken</button></section>`;
+ bindGo();
+ const sel=()=>v.chs.filter(c=>document.getElementById('mx-'+c.id).checked).flatMap(c=>c.ps.map(p=>p.key));
+ document.getElementById('mixgo').onclick=()=>{const ps=sel();if(!ps.length)return toast('Vink minstens één hoofdstuk aan.');startTest({pool:ps,n:15,title:'Grote oefentoets '+v.naam,key:v.id+'-mix',back:'vak-'+v.id,kleur:v.kleur});location.hash='toets'};
+ document.getElementById('mixpr').onclick=()=>{const ps=sel();if(!ps.length)return toast('Vink minstens één hoofdstuk aan.');startPrac({pool:ps,title:'Oefenronde '+v.naam,back:'vak-'+v.id,kleur:v.kleur});location.hash='training'};
+}
+function chTabs(ch,cur){const t=[[ch.key,'Leren',cur==='leren'],[ch.key+'-oefenen','Oefenen',cur==='oefenen']];if(ch.cards&&ch.cards.length)t.push([ch.key+'-kaarten','Flitskaarten',cur==='kaarten']);t.push([ch.key+'-toets','Oefentoets',cur==='toets']);return t}
+function learn(ch){const v=V(ch.vak);
+ app.innerHTML=shell({kleur:v.kleur,title:`H${ch.n} ${ch.t}`,back:'vak-'+v.id,backTxt:v.naam,crumb:D.best[ch.key]?'Beste toets: <b>'+dec(D.best[ch.key])+'</b>':'',tabs:chTabs(ch,'leren')});
+ document.getElementById('body').innerHTML=(ch.intro?`<section class="card" style="margin-bottom:18px">${ch.intro}</section>`:'')+ch.ps.map(p=>{const s=D.p[p.key]||{};return `<article class="para"><div><span class="pn">§ ${p.id}</span><h3>${p.t}</h3><p><b>Dit moet je kunnen:</b></p><ul>${p.can.map(c=>`<li>${c}</li>`).join('')}</ul><p class="tip">${s.g?`Al ${s.g} keer goed geoefend.`:'Nog niet geoefend.'}</p><button class="btn" data-pr="${p.key}">Oefen § ${p.id}</button></div><div>${p.learn}</div></article>`}).join('');
+ bindGo();app.querySelectorAll('[data-pr]').forEach(b=>b.onclick=()=>{startPrac({pool:ch.ps.map(p=>p.key),filter:[b.dataset.pr],chips:true,title:`H${ch.n} ${ch.t}`,back:ch.key,kleur:v.kleur,ch:ch.key});location.hash=ch.key+'-oefenen'});
+}
+
+/* ---------- practice with rounds + na-checker ---------- */
+let prac=null;const ROUND=10;
+function startPrac(o){prac=Object.assign({filter:[],chips:false,items:[],queue:[],streak:prac?prac.streak:0},o)}
+function practiceView(ch){
+ let v;if(ch){v=V(ch.vak);if(!prac||prac.ch!==ch.key)startPrac({pool:ch.ps.map(p=>p.key),chips:true,title:`H${ch.n} ${ch.t}`,back:ch.key,kleur:v.kleur,ch:ch.key});
+  app.innerHTML=shell({kleur:v.kleur,title:`H${ch.n} ${ch.t}`,back:'vak-'+v.id,backTxt:v.naam,tabs:chTabs(ch,'oefenen')})}
+ else{if(!prac){location.hash='home';return}app.innerHTML=shell({kleur:prac.kleur,title:prac.title,sub:prac.sub,back:prac.back,backTxt:'Terug'})}
+ bindGo();const body=document.getElementById('body');const isMath=k=>HUB.P[k].vak==='wi';
+ const next=()=>{if(prac.items.length>=ROUND)return summary();let key;if(prac.queue.length)key=prac.queue.shift();else{const pool=prac.filter.length?prac.filter:prac.pool;key=pick(pool)}prac.q=makeQ(key);prac.done=false;prac.hint=false;draw()};
+ const draw=()=>{const q=prac.q;const p=HUB.P[q.p];const aura=prac.streak>=10?'a3':prac.streak>=5?'a2':prac.streak>=3?'a1':'';
+  const um=D.set.uit;const showKl=isMath(q.p)&&q.type!=='mc';
+  body.innerHTML=`${prac.chips&&ch?`<div class="chips"><button class="chip" aria-pressed="${!prac.filter.length}" data-f="">Alles</button>${ch.ps.map(x=>`<button class="chip" aria-pressed="${prac.filter.length===1&&prac.filter[0]===x.key}" data-f="${x.key}">§ ${x.id}<span class="ct"> ${x.t}</span></button>`).join('')}</div>`:''}
+  <section class="sheet ${aura}"><div class="rprog">${[...Array(ROUND)].map((_,i)=>`<i class="${i<prac.items.length?(prac.items[i].ok?'ok':'no'):i===prac.items.length?'now':''}"></i>`).join('')}</div>
+  <div class="qhead"><span>${V(p.vak).naam} · § ${p.id} ${p.t}${q.hard?' · <b style="color:var(--bad)">moeilijk</b>':''}</span><span class="combo">${prac.streak>=3?`Reeks ${prac.streak}`:`Vraag ${prac.items.length+1} van ${ROUND}`}</span></div>
+  ${qHtml(q)}
+  ${showKl&&um!=='uit'?(um==='hier'?`<div class="kl"><label for="kl">Schrijf je stappen op, zoals op papier (verplicht in deze modus)</label><textarea id="kl" placeholder="bijv.&#10;3 × 4 = 12&#10;5 + 12 = 17"></textarea></div>`:`<label class="chk" style="margin-top:12px"><input type="checkbox" id="klp"> Ik heb mijn stappen op papier gezet (+5 XP)</label>`):''}
+  ${inputHtml(q)}
+  <div id="hintbox" class="tip hidden" style="margin-top:10px">Hint: ${p.hint||'Lees de uitleg van deze paragraaf nog eens.'}</div><div id="fb"></div>
+  <div class="row" style="margin-top:14px">${q.type==='mc'?'':'<button class="btn" id="chk">Kijk na</button>'}<button class="btn sec" id="hint">Hint</button><button class="btn hidden" id="nxt">Volgende</button><button class="btn sec" data-go="${ch?ch.key:prac.back}" id="leer">Uitleg</button></div>
+  ${showKl?`<div class="uitmode" style="margin-top:14px">Uitschrijven: ${[['hier','hier typen'],['papier','op papier'],['uit','uit']].map(([k,l])=>`<button class="chip" style="min-height:36px;padding:4px 12px" aria-pressed="${um===k}" data-um="${k}">${l}</button>`).join('')}</div>`:''}</section>`;
+  bindGo(body);
+  body.querySelectorAll('[data-f]').forEach(b=>b.onclick=()=>{prac.filter=b.dataset.f?[b.dataset.f]:[];next()});
+  body.querySelectorAll('[data-um]').forEach(b=>b.onclick=()=>{D.set.uit=b.dataset.um;save();draw()});
+  document.getElementById('hint').onclick=()=>{prac.hint=true;document.getElementById('hintbox').classList.remove('hidden')};
+  document.getElementById('nxt').onclick=next;
+  const inp=document.getElementById('inp');
+  if(inp){if(!document.getElementById('kl'))inp.focus({preventScroll:true});inp.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();prac.done?next():grade(inp.value)}};document.getElementById('chk').onclick=()=>grade(inp.value)}
+  body.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{if(prac.done)return;const v=q.opts[+b.dataset.o];body.querySelectorAll('.opt').forEach((x,i)=>{if(q.opts[i]===q.ans)x.classList.add('right')});if(v!==q.ans)b.classList.add('wrong');grade(v)});
+ };
+ const grade=raw=>{const q=prac.q;const fb=document.getElementById('fb');const kl=document.getElementById('kl');const notes=kl?kl.value.trim():'';
+  if(kl&&!notes&&q.type!=='mc'){fb.innerHTML='<p class="tip" style="margin-top:10px">Schrijf eerst minstens één tussenstap op. Op een toets krijg je punten voor je stappen.</p>';kl.focus();return}
+  const r=check(q,raw);if(r.empty){fb.innerHTML='<p class="tip" style="margin-top:10px">Vul eerst een antwoord in.</p>';return}
+  if(r.fmt){fb.innerHTML=`<p class="tip" style="margin-top:10px">${r.msg}</p>`;return}
+  prac.done=true;const klp=document.getElementById('klp');const wrote=!!notes||(klp&&klp.checked);
+  prac.items.push({q,raw,ok:r.ok,notes});recordAnswer(q,r.ok);let xp=0,head;
+  if(r.ok){prac.streak++;D.bestCombo=Math.max(D.bestCombo,prac.streak);xp=10+(q.hard?5:0)+Math.min(prac.streak,10);if(r.warn)xp=Math.round(xp/2);if(wrote){xp+=5;D.tot.uit++;if(D.tot.uit>=25)badge('uit25')}
+   if(prac.streak>=10)badge('r10');if(prac.streak>=20)badge('r20');
+   head=COMBO[prac.streak]||pick(GOED);sfx('ok');
+   if(q.hard&&!r.warn){const h=pick(HARD);setTimeout(()=>fx('beam',h[0],h[1]),250)}else if(COMBO[prac.streak]&&prac.streak>=5)setTimeout(()=>fx('flame',COMBO[prac.streak].split(':')[0]+'!',COMBO[prac.streak].split(':').slice(1).join(':').trim()),250)}
+  else{prac.streak=0;head=pick(FOUT);sfx('no');addFout(q,raw,notes)}
+  if(xp)addXP(xp);else save();
+  fb.innerHTML=`<div class="fb ${r.ok?'ok':'no'}"><h3>${head}</h3>${r.ok&&xp?`<p class="tip">+${xp} XP</p>`:''}${r.warn?`<p>${r.warn}</p>`:''}${!r.ok&&r.msg?`<p>${r.msg}</p>`:''}${!r.ok?`<p>Het goede antwoord: <b>${q.show}</b></p>`:''}${notes&&!r.ok?`<div class="steps2"><div><b>Jouw stappen</b><pre>${esc(notes)}</pre></div><div><b>Zo moet het</b><pre>${q.uit.replace(/<(?!\/?(b|i|sup|span)\b)[^>]*>/g,'')}</pre></div></div>`:`<p>${q.uit}</p>`}</div>`;
+  ['chk','hint'].forEach(id=>{const e=document.getElementById(id);if(e)e.classList.add('hidden')});const n=document.getElementById('nxt');n.classList.remove('hidden');n.textContent=prac.items.length>=ROUND?'Bekijk je ronde':'Volgende';n.focus({preventScroll:true});n.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();next()}};
+  const bars=body.querySelectorAll('.rprog i');bars.forEach((b,i)=>{b.className=i<prac.items.length?(prac.items[i].ok?'ok':'no'):''});
+  body.querySelector('.combo').textContent=prac.streak>=3?`Reeks ${prac.streak}`:`Vraag ${prac.items.length} van ${ROUND}`;
+  const sh=body.querySelector('.sheet');sh.classList.remove('a1','a2','a3');if(prac.streak>=10)sh.classList.add('a3');else if(prac.streak>=5)sh.classList.add('a2');else if(prac.streak>=3)sh.classList.add('a1');
+ };
+ const summary=()=>{const it=prac.items;const ok=it.filter(x=>x.ok).length;const wrong=it.filter(x=>!x.ok);
+  const msg=ok===ROUND?'Perfecte ronde! Hokage-waardig.':ok>=8?'Sterke ronde! Bijna perfect.':ok>=6?'Goed bezig. Kijk hieronder wat er misging.':'Training gaat door. Lees de uitwerkingen hieronder rustig door.';
+  if(ok===ROUND){addXP(20);setTimeout(()=>fx('flame','Perfecte ronde!','10 van de 10. +20 XP bonus.'),200)}
+  body.innerHTML=`<section class="sheet"><div class="grade"><span class="g ${ok<6?'low':''}">${ok}/${ROUND}</span><div><h2>Ronde klaar</h2><p>${msg}</p></div></div>
+  <h3 style="margin-top:20px">Na-checker: ${wrong.length?'dit ging fout':'niets fout, top!'}</h3>
+  ${wrong.map(x=>`<div class="rev"><p class="mark no">§ ${HUB.P[x.q.p].id} ${HUB.P[x.q.p].t}</p>${qHtml(x.q)}<p>Jouw antwoord: <b>${x.q.type==='mc'?x.raw:esc(x.raw)}</b> · Goed: <b>${x.q.show}</b></p>${x.notes?`<div class="steps2"><div><b>Jouw stappen</b><pre>${esc(x.notes)}</pre></div><div><b>Zo moet het</b><pre>${x.q.uit.replace(/<(?!\/?(b|i|sup|span)\b)[^>]*>/g,'')}</pre></div></div>`:`<p>${x.q.uit}</p>`}</div>`).join('')}
+  <div class="row" style="margin-top:16px">${wrong.length?'<button class="btn gold" id="redo">Herkansing: vergelijkbare vragen</button>':''}<button class="btn" id="again">Nieuwe ronde</button><button class="btn sec" data-go="fouten">Naar foutenboek</button></div></section>`;
+  bindGo(body);
+  const rd=document.getElementById('redo');if(rd)rd.onclick=()=>{prac.queue=shuffle(wrong.map(x=>x.q.p).concat(wrong.map(x=>x.q.p))).slice(0,ROUND);prac.items=[];next()};
+  document.getElementById('again').onclick=()=>{prac.items=[];next()};
+ };
+ if(prac.q&&!prac.done&&prac.items.length<ROUND&&prac.view===location.hash)draw();else{prac.view=location.hash;if(prac.items.length>=ROUND)prac.items=[];next()}
+}
+
+/* ---------- test ---------- */
+let test=null;
+function startTest(o){const order=[];let pool=shuffle(o.pool);while(order.length<o.n){if(!pool.length)pool=shuffle(o.pool);order.push(pool.pop())}test=Object.assign({qs:order.map(k=>makeQ(k)),i:0,ans:[],t0:Date.now(),done:false},o)}
+function testView(ch){
+ let v;if(ch){v=V(ch.vak);app.innerHTML=shell({kleur:v.kleur,title:`H${ch.n} ${ch.t}`,back:'vak-'+v.id,backTxt:v.naam,tabs:chTabs(ch,'toets')})}
+ else{if(!test){location.hash='home';return}app.innerHTML=shell({kleur:test.kleur,title:test.title,back:test.back,backTxt:'Terug'})}
+ bindGo();const body=document.getElementById('body');const key=ch?ch.key:test.key;
+ if(!test||test.key!==key){
+  body.innerHTML=`<section class="sheet"><h2>Oefentoets H${ch.n}</h2><p class="big" style="margin-top:8px">12 vragen uit het hele hoofdstuk.</p><ul><li>Geen hints en geen nakijken tussendoor, net als een echte toets.</li><li>Pak pen en kladpapier erbij en schrijf je stappen op.</li><li>Aan het eind krijg je een cijfer en de na-checker laat zien wat er misging.</li></ul>${D.last[key]?`<p class="tip">Vorige keer: ${dec(D.last[key])}</p>`:''}<button class="btn gold" id="go">Start de toets</button></section>`;
+  document.getElementById('go').onclick=()=>{startTest({pool:ch.ps.map(p=>p.key),n:12,key,title:`H${ch.n} ${ch.t}`,back:ch.key,kleur:v.kleur,ch:ch.key});testView(ch)};return}
+ if(test.done)return results(ch,body);
+ const q=test.qs[test.i];let sel=null;
+ body.innerHTML=`<section class="sheet"><div class="qhead"><span>Vraag ${test.i+1} van ${test.qs.length}</span><span>${V(HUB.P[q.p].vak).naam} · § ${HUB.P[q.p].id}</span></div><div class="rprog">${test.qs.map((_,i)=>`<i class="${i<test.i?'ok':i===test.i?'now':''}" style="${i<test.i?'background:var(--vk)':''}"></i>`).join('')}</div>${qHtml(q)}${inputHtml(q)}<div class="row" style="margin-top:16px"><button class="btn" id="nx">${test.i===test.qs.length-1?'Inleveren':'Volgende vraag'}</button><button class="btn sec" id="stop">Stoppen</button></div><p id="warn" class="tip"></p></section>`;
+ const inp=document.getElementById('inp');
+ body.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{body.querySelectorAll('.opt').forEach(x=>x.classList.remove('sel'));b.classList.add('sel');sel=q.opts[+b.dataset.o]});
+ const go=()=>{const val=inp?inp.value:sel;if(val===null||String(val).trim()===''){const w=document.getElementById('warn');if(!w.dataset.once){w.dataset.once=1;w.textContent='Je hebt nog niets ingevuld. Weet je het echt niet? Klik nog een keer om door te gaan.';return}}
+  test.ans[test.i]=val??'';test.i++;if(test.i>=test.qs.length){test.done=true;finish()}testView(ch)};
+ document.getElementById('nx').onclick=go;document.getElementById('stop').onclick=()=>{test=null;ch?testView(ch):(location.hash=prac&&prac.back||'home')};
+ if(inp){inp.focus({preventScroll:true});inp.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();go()}}}
+}
+function finish(){const res=test.qs.map((q,i)=>check(q,test.ans[i]));test.res=res;const ok=res.filter(r=>r.ok).length;
+ test.grade=Math.round((1+9*ok/test.qs.length)*10)/10;test.ok=ok;D.last[test.key]=test.grade;if(!D.best[test.key]||test.grade>D.best[test.key])D.best[test.key]=test.grade;
+ test.qs.forEach((q,i)=>{recordAnswer(q,res[i].ok);if(!res[i].ok)addFout(q,test.ans[i],'')});
+ if(test.grade>=8)badge('t8');if(test.grade>=10)badge('t10');addXP(Math.round(test.grade*10));
+ setTimeout(()=>{if(test.grade>=8)fx('level',test.grade>=10?'Hokage-niveau!':'Chūnin-examen gehaald!',`Een ${dec(test.grade)}! +${Math.round(test.grade*10)} XP.`);else if(test.grade>=5.5)fx('flame','Voldoende!',`Een ${dec(test.grade)}. Werk je fouten weg en je gaat nog hoger.`)},300)}
+function results(ch,body){const t=test;const mins=Math.max(1,Math.round((Date.now()-t.t0)/60000));const wrongPs=[...new Set(t.qs.filter((q,i)=>!t.res[i].ok).map(q=>q.p))];
+ const msg=t.grade>=8?'Super gedaan! Deze stof zit erin.':t.grade>=5.5?'Voldoende! Werk de rode vragen weg, dan wordt het nog beter.':'Nog niet voldoende. Geen probleem: lees de uitleg van de rode paragrafen en oefen ze. Elke sensei begon ooit onderaan.';
+ body.innerHTML=`<section class="sheet"><div class="grade"><span class="g ${t.grade<5.5?'low':''}">${dec(t.grade)}</span><div><h2>${t.ok} van de ${t.qs.length} goed</h2><p>${msg}</p><p class="tip">Tijd: ongeveer ${mins} ${mins===1?'minuut':'minuten'} · +${Math.round(t.grade*10)} XP</p></div></div>
+ <div class="row" style="margin-top:14px">${wrongPs.length?`<button class="btn gold" id="fix">Oefen je fouten</button>`:''}<button class="btn sec" id="again">Nieuwe toets</button></div>
+ <h3 style="margin-top:24px">Na-checker</h3>${t.qs.map((q,i)=>{const r=t.res[i];return `<div class="rev"><p class="mark ${r.ok?'ok':'no'}">Vraag ${i+1}: ${r.ok?'goed':'fout'} <span class="tip">(§ ${HUB.P[q.p].id} ${HUB.P[q.p].t})</span></p>${qHtml(q)}<p>Jouw antwoord: <b>${q.type==='mc'&&t.ans[i]?t.ans[i]:esc(t.ans[i]||'niets ingevuld')}</b>${r.ok?'':` · Goed antwoord: <b>${q.show}</b>`}</p>${r.warn?`<p>${r.warn}</p>`:''}${r.ok?'':`<p>${q.uit}</p>`}</div>`}).join('')}</section>`;
+ const f=document.getElementById('fix');if(f)f.onclick=()=>{startPrac({pool:wrongPs,queue:shuffle(wrongPs.concat(wrongPs)).slice(0,ROUND),title:'Fouten oefenen',back:ch?ch.key:t.back,kleur:t.kleur});test=null;location.hash='training'};
+ document.getElementById('again').onclick=()=>{const o=Object.assign({},t);test=null;if(ch)testView(ch);else{startTest({pool:o.pool,n:o.n,key:o.key,title:o.title,back:o.back,kleur:o.kleur});testView(null)}};
+}
+
+/* ---------- flashcards ---------- */
+let fcs=null;
+function cardsView(ch){const v=V(ch.vak);
+ app.innerHTML=shell({kleur:v.kleur,title:`H${ch.n} ${ch.t}`,back:'vak-'+v.id,backTxt:v.naam,tabs:chTabs(ch,'kaarten')});bindGo();
+ const body=document.getElementById('body');const deck=ch.cards.map((c,i)=>({f:c[0],b:c[1],k:ch.key+'#'+i}));
+ const box=k=>D.cards[k]||0;
+ const start=()=>{const ord=shuffle(deck).sort((a,b)=>box(a.k)-box(b.k)).slice(0,12);fcs={ch:ch.key,ord,i:0,know:0,again:0,mode:fcs&&fcs.ch===ch.key?fcs.mode:((ch.typeCards??v.typeCards)?'type':'flip'),dir:fcs&&fcs.ch===ch.key?fcs.dir:0};draw()};
+ const draw=()=>{if(fcs.i>=fcs.ord.length)return end();const c=fcs.ord[fcs.i];const front=fcs.dir?c.b:c.f,back=fcs.dir?c.f:c.b;const known=deck.filter(d=>box(d.k)>=3).length;
+  body.innerHTML=`<div class="row" style="justify-content:space-between;margin-bottom:12px"><div class="row"><button class="chip" aria-pressed="${fcs.mode==='flip'}" data-m="flip">Omdraaien</button><button class="chip" aria-pressed="${fcs.mode==='type'}" data-m="type">Overhoren (typen)</button><button class="chip" data-d="1">${fcs.dir?(v.cardLabels||['begrip','uitleg'])[1]+' → '+(v.cardLabels||['begrip','uitleg'])[0]:(v.cardLabels||['begrip','uitleg'])[0]+' → '+(v.cardLabels||['begrip','uitleg'])[1]}</button></div><span class="tip">Kaart ${fcs.i+1} van ${fcs.ord.length} · ${known}/${deck.length} kaarten zitten erin</span></div>
+  <div class="fc" id="fc"><div class="fcin"><div class="fside">${front}<small>${fcs.mode==='flip'?'Tik om om te draaien':'Typ het antwoord hieronder'}</small></div><div class="fside back">${back}</div></div></div>
+  ${fcs.mode==='flip'?`<div class="row" style="justify-content:center;margin-top:16px"><button class="btn sec" id="no">Nog niet</button><button class="btn" id="yes">Wist ik!</button></div>`:`<div class="ans" style="justify-content:center"><input id="inp" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Typ je antwoord" aria-label="Je antwoord"><button class="btn" id="tc">Check</button></div><div id="fb" style="max-width:620px;margin:0 auto"></div>`}
+  <div class="boxes">${[0,1,2,3,4].map(b=>`<span>bak ${b+1}: ${deck.filter(d=>box(d.k)===b).length}</span>`).join('')}</div><p class="tip" style="text-align:center">Kaarten die je weet schuiven naar een hogere bak en komen minder vaak terug.</p>`;
+  body.querySelectorAll('[data-m]').forEach(b=>b.onclick=()=>{fcs.mode=b.dataset.m;draw()});
+  body.querySelector('[data-d]').onclick=()=>{fcs.dir=fcs.dir?0:1;draw()};
+  const fc=document.getElementById('fc');
+  if(fcs.mode==='flip'){fc.onclick=()=>fc.classList.toggle('flip');document.getElementById('yes').onclick=()=>mark(true);document.getElementById('no').onclick=()=>mark(false)}
+  else{const inp=document.getElementById('inp');inp.focus({preventScroll:true});let done=false;const go=()=>{if(done)return next1();const r=check({type:'txt',ans:back.split(/\s*[\/;]\s*|\s*\(.*?\)\s*/).filter(Boolean).concat([back]),strict:false},inp.value);if(r.empty)return;done=true;fc.classList.add('flip');document.getElementById('fb').innerHTML=`<div class="fb ${r.ok?'ok':'no'}"><h3>${r.ok?pick(GOED):'Nog niet'}</h3>${r.warn?`<p>${r.warn}</p>`:''}<p>Antwoord: <b>${back}</b></p></div>`;document.getElementById('tc').textContent='Volgende';fcs.lastOk=r.ok;sfx(r.ok?'ok':'no')};const next1=()=>mark(fcs.lastOk);document.getElementById('tc').onclick=go;inp.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();go()}}}
+ };
+ const mark=ok=>{const c=fcs.ord[fcs.i];D.cards[c.k]=ok?Math.min(4,box(c.k)+1):0;if(ok)fcs.know++;else{fcs.again++;if(fcs.ord.filter(x=>x.k===c.k).length<2)fcs.ord.push(c)}
+  touchDay();dayRec().cards++;D.tot.cards++;if(D.tot.cards>=100)badge('k100');addXP(ok?3:1);missionCheck();fcs.i++;draw()};
+ const end=()=>{body.innerHTML=`<section class="sheet"><div class="grade"><span class="g">${fcs.know}</span><div><h2>Kaarten klaar</h2><p>${fcs.know} keer "wist ik", ${fcs.again} keer "nog niet". De kaarten die je nog niet wist, komen de volgende keer als eerste.</p></div></div><div class="row" style="margin-top:14px"><button class="btn" id="more">Nog een rondje</button><button class="btn sec" data-go="${ch.key}-oefenen">Oefenvragen</button></div></section>`;bindGo(body);document.getElementById('more').onclick=start};
+ start();
+}
+
+/* ---------- foutenboek ---------- */
+function foutenView(){setVk('#c4304b');
+ app.innerHTML=shell({kleur:'#a3263d',title:'Foutenboek',sub:'Hier komt elke fout terecht. Doe hem opnieuw: goed = weggewerkt. Zo leer je het meeste.'});bindGo();
+ const body=document.getElementById('body');
+ const draw=()=>{if(!D.fouten.length){body.innerHTML=`<section class="card"><h2>Je foutenboek is leeg</h2><p>Netjes! Alles is weggewerkt. Ga oefenen, en wat je fout doet komt hier vanzelf.</p><button class="btn" data-go="home">Naar home</button></section>`;bindGo(body);return}
+  const byVak={};D.fouten.forEach((f,i)=>{const vk=HUB.P[f.q.p]?HUB.P[f.q.p].vak:'?';(byVak[vk]=byVak[vk]||[]).push([f,i])});
+  body.innerHTML=`<div class="row" style="margin-bottom:14px"><button class="btn gold" id="all">Oefen 10 vergelijkbare vragen</button><span class="tip">${D.fouten.length} fout${D.fouten.length===1?'':'en'} · ${D.tot.fixed} weggewerkt</span></div>`+Object.entries(byVak).map(([vk,arr])=>`<h2 style="margin:18px 0 8px">${(V(vk)||{naam:vk}).naam}</h2>`+arr.map(([f,i])=>{const p=HUB.P[f.q.p];return `<section class="sheet" style="margin-bottom:14px" data-i="${i}"><div class="qhead"><span>§ ${p?p.id+' '+p.t:''}</span><span>${f.t}</span></div>${qHtml(f.q)}<p class="tip">Toen antwoordde je: ${f.q.type==='mc'?f.raw:esc(f.raw||'niets')}</p><div class="redo"></div><div class="row" style="margin-top:10px"><button class="btn" data-r="${i}">Opnieuw proberen</button><button class="btn sec" data-s="${i}">Laat oplossing zien</button></div><div class="sol hidden"><p>Goed: <b>${f.q.show}</b></p><p>${f.q.uit}</p></div></section>`}).join('')).join('');
+  document.getElementById('all').onclick=()=>{const ks=[...new Set(D.fouten.map(f=>f.q.p))].filter(k=>HUB.P[k]);startPrac({pool:ks,queue:shuffle(ks.concat(ks)).slice(0,ROUND),title:'Fouten wegwerken',back:'fouten',kleur:'#a3263d'});location.hash='training'};
+  body.querySelectorAll('[data-s]').forEach(b=>b.onclick=()=>b.closest('section').querySelector('.sol').classList.toggle('hidden'));
+  body.querySelectorAll('[data-r]').forEach(b=>b.onclick=()=>{const i=+b.dataset.r;const f=D.fouten[i];const sec=b.closest('section');const box=sec.querySelector('.redo');const q=f.q;
+   box.innerHTML=inputHtml(q)+(q.type==='mc'?'':'<button class="btn" style="margin-top:10px" id="rc'+i+'">Kijk na</button>')+'<div class="rfb"></div>';b.classList.add('hidden');
+   const done=raw=>{const r=check(q,raw);if(r.empty||r.fmt){box.querySelector('.rfb').innerHTML=`<p class="tip">${r.msg||'Vul eerst iets in.'}</p>`;return}
+    if(r.ok){sfx('ok');D.tot.fixed++;if(D.tot.fixed>=10)badge('fix10');D.fouten.splice(i,1);addXP(8);toast(pick(['Fout weggewerkt! +8 XP','Die is verslagen! +8 XP','Rematch gewonnen! +8 XP']));draw()}
+    else{sfx('no');box.querySelector('.rfb').innerHTML=`<div class="fb no"><h3>Nog niet</h3><p>Goed: <b>${q.show}</b></p><p>${q.uit}</p><p class="tip">Hij blijft in je foutenboek. Probeer het later nog eens.</p></div>`}};
+   const inp=box.querySelector('input');if(inp){inp.focus();inp.onkeydown=e=>{if(e.key==='Enter')done(inp.value)};document.getElementById('rc'+i).onclick=()=>done(inp.value)}
+   box.querySelectorAll('.opt').forEach(o=>o.onclick=()=>done(q.opts[+o.dataset.o]))})};
+ draw();
+}
+
+/* ---------- mijn pad ---------- */
+function padView(){app.innerHTML=shell({kleur:'#13233a',title:'Mijn pad',sub:`${rank(level(D.xp))} · level ${level(D.xp)} · ${D.xp} XP`});bindGo();
+ const body=document.getElementById('body');const n=Object.keys(D.badges).length;
+ body.innerHTML=`<section class="card"><h2>Badges (${n} van ${BADGES.length})</h2><div class="badges">${BADGES.map((b,i)=>`<div class="bdg ${D.badges[b[0]]?'':'off'}">${medal(i,!!D.badges[b[0]])}<b>${b[1]}</b><span>${b[2]}</span></div>`).join('')}</div></section>
+ <section class="card" style="margin-top:18px"><h2>Voortgang per vak</h2><div class="vbars">${HUB.vakken.map(v=>`<div class="vb"><span>${v.naam}</span><span class="t"><i style="width:${vakPct(v)}%;background:${v.kleur}"></i></span><span class="n">${vakPct(v)}%</span></div>`).join('')}</div>
+ <p class="tip" style="margin-top:12px">Totaal ${D.tot.g} goed en ${D.tot.f} fout · ${D.tot.cards} flitskaarten · ${D.tot.uit} keer uitgeschreven · beste reeks ${D.bestCombo}</p></section>
+ <section class="card" style="margin-top:18px"><h2>Rangen</h2><div class="scroll"><table class="tbl"><tr><th>Level</th><th>Rang</th></tr>${RANKS.map(r=>`<tr><td>${r[0]}</td><td>${r[1]}${rank(level(D.xp))===r[1]?' <b>(jij)</b>':''}</td></tr>`).join('')}</table></div><p class="tip">Elke goede vraag geeft XP, moeilijke vragen en reeksen geven extra. Stappen uitschrijven: +5 XP.</p><button class="btn sec" id="sett">Instellingen</button></section>`;
+ document.getElementById('sett').onclick=settings}
+
+/* ---------- planner ---------- */
+function plannerView(){app.innerHTML=shell({kleur:'#13233a',title:'Toetsplanner',sub:'Vul in wanneer je toets is. Je krijgt per dag een klein, duidelijk lijstje.'});bindGo();
+ const body=document.getElementById('body');const t=new Date();t.setDate(t.getDate()+5);
+ body.innerHTML=`<section class="card"><h2>Nieuwe toets</h2><div class="field"><label for="pv">Vak</label><select id="pv">${HUB.vakken.map(v=>`<option value="${v.id}">${v.naam}</option>`).join('')}</select></div><div class="field"><label for="pd">Datum van de toets</label><input type="date" id="pd" value="${iso(t)}" min="${today()}"></div><div id="pch" class="row"></div><button class="btn gold" id="pmk" style="margin-top:14px">Maak mijn planning</button></section><div id="plist"></div>`;
+ const pv=document.getElementById('pv');const fill=()=>{const v=V(pv.value);document.getElementById('pch').innerHTML='<p style="width:100%;margin:6px 0 0"><b>Welke hoofdstukken?</b></p>'+v.chs.map(c=>`<label class="chk"><input type="checkbox" value="${c.key}"> H${c.n} ${c.t}</label>`).join('')};pv.onchange=fill;fill();
+ document.getElementById('pmk').onclick=()=>{const v=V(pv.value);const date=document.getElementById('pd').value;const chs=[...document.querySelectorAll('#pch input:checked')].map(i=>i.value);if(!date||date<today())return toast('Kies een datum vanaf vandaag.');if(!chs.length)return toast('Kies minstens één hoofdstuk.');
+  const days=[];const d=new Date();while(iso(d)<date&&days.length<10){days.push(iso(d));d.setDate(d.getDate()+1)}if(!days.length)days.push(today());
+  const learnT=chs.flatMap(k=>{const c=CHK(k);const out=[{h:k,l:`Lees H${c.n}`},{h:k+'-oefenen',l:`Oefen H${c.n}`}];if(c.cards)out.push({h:k+'-kaarten',l:`Flitskaarten H${c.n}`});return out});
+  const testT=chs.map(k=>({h:k+'-toets',l:`Oefentoets H${CHK(k).n}`}));const tasks=days.map(dd=>({d:dd,items:[]}));
+  const nl=Math.max(1,days.length-1);learnT.forEach((x,i)=>tasks[Math.min(nl-1,Math.floor(i*nl/learnT.length))].items.push(x));
+  tasks[tasks.length-1].items.push(...testT,{h:'fouten',l:'Foutenboek leeg maken'});
+  D.plans=D.plans.filter(p=>p.date>=today());D.plans.push({vak:v.id,date,chs,tasks});save();toast('Planning gemaakt!');list()};
+ const list=()=>{const ps=D.plans.filter(p=>p.date>=today()).sort((a,b)=>a.date<b.date?-1:1);document.getElementById('plist').innerHTML=ps.map((p,pi)=>`<section class="card plan" style="margin-top:18px"><div class="bar"><h2>${V(p.vak).naam} · ${new Date(p.date+'T12:00').toLocaleDateString('nl-NL',{weekday:'long',day:'numeric',month:'long'})}</h2><button class="btn small sec" data-del="${D.plans.indexOf(p)}">Verwijderen</button></div>${p.tasks.map(t=>`<p style="margin-top:10px"><b>${t.d===today()?'Vandaag':new Date(t.d+'T12:00').toLocaleDateString('nl-NL',{weekday:'long',day:'numeric',month:'short'})}</b></p><div class="row">${t.items.map(x=>`<button class="btn small ${t.d===today()?'':'sec'}" data-go="${x.h}">${x.l}</button>`).join('')}</div>`).join('')}<p class="tip" style="margin-top:10px">Elke dag 15 tot 25 minuten. Zet de focustimer aan.</p></section>`).join('');bindGo(document.getElementById('plist'));document.querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>{D.plans.splice(+b.dataset.del,1);save();list()})};
+ list()}
+
+/* ---------- settings ---------- */
+function settings(){const d=document.createElement('div');d.className='dlg';d.innerHTML=`<div class="card"><h2>Instellingen</h2><label class="chk" style="margin-top:10px"><input type="checkbox" id="snd" ${D.set.sound?'checked':''}> Geluidjes aan</label><p style="margin-top:14px"><b>Alles opnieuw beginnen</b></p><p class="tip">Wist XP, badges, voortgang, foutenboek en planning op dit apparaat.</p><div class="row"><button class="btn sec" id="rs">Alles wissen</button><button class="btn" id="cl">Sluiten</button></div><p id="rsq" class="hidden" style="margin-top:10px">Zeker weten? <button class="btn small" id="rsy" style="background:var(--bad)">Ja, wis alles</button></p></div>`;document.body.appendChild(d);
+ d.onclick=e=>{if(e.target===d)d.remove()};d.querySelector('#cl').onclick=()=>d.remove();d.querySelector('#snd').onchange=e=>{D.set.sound=e.target.checked;save()};d.querySelector('#rs').onclick=()=>d.querySelector('#rsq').classList.remove('hidden');d.querySelector('#rsy').onclick=()=>{D=fresh();save();d.remove();toast('Alles gewist. Nieuwe start!');route()}}
+
+/* ================= tools drawer ================= */
+let drawerTab='calc';
+const fab=document.createElement('button');fab.className='fab';fab.innerHTML=`${TI.calc.replace('viewBox','width="24" height="24" viewBox')}<span>Tools</span>`;fab.setAttribute('aria-label','Tools: rekenmachine, focustimer, kladblok');document.body.appendChild(fab);
+const dr=document.createElement('div');dr.className='drawer hidden';document.body.appendChild(dr);
+fab.onclick=()=>{dr.classList.contains('hidden')?openDrawer(drawerTab):dr.classList.add('hidden')};
+function openDrawer(t){drawerTab=t;dr.classList.remove('hidden');dr.innerHTML=`<div class="dtabs">${[['calc','Rekenen'],['timer','Timer'],['kl','Kladblok']].map(([k,l])=>`<button aria-pressed="${t===k}" data-dt="${k}">${l}</button>`).join('')}</div><div id="dbody"></div><div style="text-align:right;margin-top:10px"><button class="btn small sec" id="dclose">Sluiten</button></div>`;
+ dr.querySelectorAll('[data-dt]').forEach(b=>b.onclick=()=>openDrawer(b.dataset.dt));dr.querySelector('#dclose').onclick=()=>dr.classList.add('hidden');
+ const db=dr.querySelector('#dbody');if(t==='calc')calcUI(db);if(t==='timer')timerUI(db);if(t==='kl'){db.innerHTML=`<div class="kl" style="margin:0"><label for="notes">Kladblok (blijft bewaard op dit apparaat)</label><textarea id="notes" style="min-height:220px">${esc(D.notes||'')}</textarea></div>`;const ta=db.querySelector('#notes');ta.oninput=()=>{D.notes=ta.value;save()}}}
+/* calculator: own parser, no eval */
+function calcEval(s){s=s.replace(/\s/g,'').replace(/,/g,'.').replace(/[×x*]/g,'*').replace(/[:÷/]/g,'/').replace(/[−–]/g,'-').replace(/²/g,'^2');let i=0;
+ const peek=()=>s[i];const num=()=>{const m=s.slice(i).match(/^\d*\.?\d+/);if(!m)throw 0;i+=m[0].length;return +m[0]};
+ const prim=()=>{let v;if(peek()==='('){i++;v=expr();if(s[i++]!==')')throw 0}else if(peek()==='√'){i++;v=Math.sqrt(prim())}else if(s.slice(i,i+3)==='ans'){i+=3;v=lastAns}else v=num();while(peek()==='%'){i++;v/=100}return v};
+ const pow=()=>{let b=prim();if(peek()==='^'){i++;return b**fac()}return b};
+ const fac=()=>{if(peek()==='-'){i++;return -fac()}if(peek()==='+'){i++;return fac()}return pow()};
+ const term=()=>{let v=fac();while(peek()==='*'||peek()==='/'||peek()==='('||peek()==='√'){const o=peek();if(o==='('||o==='√'){v*=fac();continue}i++;const r=fac();v=o==='*'?v*r:v/r}return v};
+ const expr=()=>{let v=term();while(peek()==='+'||peek()==='-'){const o=s[i++];const r=term();v=o==='+'?v+r:v-r}return v};
+ const v=expr();if(i<s.length)throw 0;return v}
+let lastAns=0,hist=[];
+function calcUI(db){db.innerHTML=`<div class="calc"><input id="ce" inputmode="none" aria-label="Som" placeholder="bijv. (3+4)×2"><div class="res" id="cr">&nbsp;</div><div class="keys">${['7','8','9',':','C','4','5','6','×','⌫','1','2','3','−','(','0',',','%','+',')','x²','√','ans','=',''].map(k=>k?`<button class="${/[:×−+=]/.test(k)?(k==='='?'eq':'op'):''}" data-k="${k}">${k}</button>`:'<span></span>').join('')}</div><div class="hist" id="ch"></div><p class="tip">Typ ook gewoon met je toetsenbord. Gebruik de rekenmachine alleen als dat bij jouw toets mag.</p></div>`;
+ const ce=db.querySelector('#ce'),cr=db.querySelector('#cr'),ch=db.querySelector('#ch');const showH=()=>ch.innerHTML=hist.map(h=>`<div>${esc(h)}</div>`).join('');showH();
+ const calc=()=>{try{const v=calcEval(ce.value||'0');if(!isFinite(v))throw 0;lastAns=v;const out=dec(Math.round(v*1e10)/1e10);cr.textContent=out;hist.unshift(ce.value+' = '+out);hist=hist.slice(0,5);showH()}catch(e){cr.textContent='Klopt niet, check je som'}};
+ ce.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();calc()}};
+ db.querySelectorAll('[data-k]').forEach(b=>b.onclick=()=>{const k=b.dataset.k;if(k==='C'){ce.value='';cr.innerHTML='&nbsp;'}else if(k==='⌫')ce.value=ce.value.slice(0,-1);else if(k==='=')calc();else ce.value+=k==='x²'?'²':k==='ans'?'ans':k;sfx('tick')})}
+/* focus timer */
+let TM=null;const mini=document.createElement('div');mini.className='mini hidden';document.body.appendChild(mini);mini.onclick=()=>openDrawer('timer');
+function timerUI(db){const R=80,c=2*Math.PI*R;const draw=()=>{const left=TM?Math.max(0,TM.end-Date.now()):0;const fr2=TM?left/TM.dur:1;const mm=Math.floor(left/60000),ss=Math.floor(left/1000)%60;
+  db.innerHTML=`<div class="timer"><svg viewBox="0 0 190 190"><circle cx="95" cy="95" r="${R}" fill="none" stroke="var(--grid)" stroke-width="14"/><circle cx="95" cy="95" r="${R}" fill="none" stroke="${TM&&TM.phase==='pauze'?'#5aa9ff':'var(--gold)'}" stroke-width="14" stroke-linecap="round" stroke-dasharray="${c*fr2} ${c}" transform="rotate(-90 95 95)"/><text x="95" y="104" text-anchor="middle" font-size="34" font-weight="800" font-family="Baloo 2,sans-serif" fill="var(--ink)">${TM?`${mm}:${String(ss).padStart(2,'0')}`:'klaar'}</text></svg><p><b>${TM?(TM.phase==='focus'?'Focus! Alleen deze taak.':'Pauze: sta op, drink water.'):'Kies een focusronde'}</b></p>
+  <div class="row" style="justify-content:center">${TM?'<button class="btn sec" id="tstop">Stop</button>':[10,15,20,25].map(m=>`<button class="btn small" data-m="${m}">${m} min</button>`).join('')}</div><p class="tip">Tip: telefoon weg, één vak tegelijk. Na de ronde krijg je 5 minuten pauze en +15 XP.</p></div>`;
+  db.querySelectorAll('[data-m]').forEach(b=>b.onclick=()=>{startTimer(+b.dataset.m,'focus');draw()});const st=db.querySelector('#tstop');if(st)st.onclick=()=>{clearInterval(TM.id);TM=null;mini.classList.add('hidden');draw()}};
+ draw();clearInterval(db._iv);db._iv=setInterval(()=>{if(!document.body.contains(db)||dr.classList.contains('hidden')||drawerTab!=='timer')return clearInterval(db._iv);draw()},1000)}
+function startTimer(min,phase){if(TM)clearInterval(TM.id);TM={dur:min*60000,end:Date.now()+min*60000,phase};mini.classList.remove('hidden');
+ TM.id=setInterval(()=>{const left=TM.end-Date.now();mini.textContent=`${TM.phase==='focus'?'Focus':'Pauze'} ${Math.floor(Math.max(0,left)/60000)}:${String(Math.floor(Math.max(0,left)/1000)%60).padStart(2,'0')}`;
+  if(left<=0){clearInterval(TM.id);if(TM.phase==='focus'){addXP(15);badge('focus');fx('timer','Focusronde klaar!','+15 XP. Nu 5 minuten pauze: even bewegen.');startTimer(5,'pauze')}else{TM=null;mini.classList.add('hidden');fx('timer','Pauze voorbij','Klaar voor de volgende ronde? Open de timer bij Tools.')}}},1000)}
+
+/* ================= router ================= */
+function route(){const h=location.hash.slice(1)||'home';window.scrollTo(0,0);dr.classList.add('hidden');
+ if(h==='home')return home();if(h==='training')return practiceView(null);if(h==='toets')return testView(null);if(h==='fouten')return foutenView();if(h==='pad')return padView();if(h==='planner')return plannerView();
+ if(h.startsWith('vak-')){const v=V(h.slice(4));if(v)return vakView(v)}
+ const parts=h.split('-');const ch=CHK(parts[0]+'-'+parts[1]);
+ if(ch){if(parts[2]==='oefenen')return practiceView(ch);if(parts[2]==='toets')return testView(ch);if(parts[2]==='kaarten'&&ch.cards)return cardsView(ch);return learn(ch)}
+ home()}
+window.addEventListener('hashchange',route);
+route();
+window.__t={check,makeQ,parseAlg,D:()=>D};
+}
+</script>
+</body>
+</html>
